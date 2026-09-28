@@ -1,6 +1,6 @@
 # AI Kids Invitation
 
-I wanted to make my kid's birthday invitation feel like his own little story, so I built this one with AI agents. You can do the same for your child — the demo uses Gael turning 4, but the config file takes any name and any age ("turning 3", "turning 7", or drop the number entirely in the copy). The guide walks through the prompts and steps.
+My son Gael wanted his fourth birthday to feel like a comic book where he was the hero, so I built this invitation with AI agents: he swings in, points guests to his HQ, and waits for a high five. Swap in your child's name, age and party details, and it becomes their story instead — turning 3, turning 7, whatever the number is.
 
 **Live demo:** [ai-kids-invitation.vercel.app](https://ai-kids-invitation.vercel.app)
 
