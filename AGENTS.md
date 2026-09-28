@@ -50,11 +50,11 @@ scripts/
 ## Development Commands
 
 ```bash
-npm run dev              # Astro dev server → http://localhost:4321
-npm run check            # Type-check all .astro and .ts files
-npm run build            # astro check && astro build → dist/
-npm run preview          # Preview built site locally
-npx astro <command>      # Astro CLI passthrough
+pnpm dev              # Astro dev server → http://localhost:4321
+pnpm check            # Type-check all .astro and .ts files
+pnpm build            # astro check && astro build → dist/
+pnpm preview          # Preview built site locally
+pnpm astro <command>     # Astro CLI passthrough
 ```
 
 ### Agent-mode dev server (Astro 7)
@@ -163,7 +163,7 @@ Fonts: **Bangers** (`font-display`) for headings, **Nunito** (`font-body`) for b
 ## Runtime & Dependencies
 
 - **Runtime:** Node.js >= 22.12.0 (`engines` in package.json)
-- **Package manager:** npm (lockfile committed)
+- **Package manager:** pnpm (`pnpm-lock.yaml` committed; `packageManager` pinned in package.json)
 - **Framework:** Astro 7 — static output mode (no explicit `output` in config)
 - **Build tool:** Vite 8 + Rolldown (bundled with Astro 7)
 - **Linter/formatter:** None configured
@@ -176,12 +176,12 @@ Runtime dependencies: `astro`, `gsap`, `tailwindcss`. Dev dependencies: `typescr
 
 **No automated test suite** — intentional for a static invitation site with no application logic.
 
-**Code quality gate:** `astro check` runs type-checking before every build (`npm run build` = `astro check && astro build`).
+**Code quality gate:** `astro check` runs type-checking before every build (`pnpm build` = `astro check && astro build`).
 
 ### Verification approach
 
-1. `npm run build` — must succeed with zero warnings
-2. `npm run preview` — visual check on mobile (375px) and desktop viewports
+1. `pnpm build` — must succeed with zero warnings
+2. `pnpm preview` — visual check on mobile (375px) and desktop viewports
 3. WhatsApp deep link: verify pre-filled message opens on a real phone
 4. Google Maps + Waze links: verify correct address opens
 5. OG preview: share link in WhatsApp, confirm image/title/description render

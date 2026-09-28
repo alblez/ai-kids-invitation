@@ -22,7 +22,7 @@ Fork this repo on GitHub, then clone your fork:
 ```sh
 git clone https://github.com/<your-username>/ai-kids-invitation.git
 cd ai-kids-invitation
-npm install
+pnpm install
 ```
 
 Prerequisites: Node >= 22.12 (see `package.json`). The OG image generator (`scripts/generate-og.mjs`) uses macOS `sips`, so it only runs on a Mac.
@@ -44,7 +44,7 @@ Regenerate the WhatsApp preview image and deploy:
 
 ```sh
 node scripts/generate-og.mjs
-npm run build
+pnpm build
 # Deploy to Vercel: connect the repo and it auto-detects Astro
 ```
 
@@ -57,7 +57,7 @@ The agentic process repository behind this project, **agentic-roadmaps**, will b
 ## Development
 
 ```sh
-npm run dev      # dev server at localhost:4321
-npm run build    # type-check + production build
-npm run preview  # preview the built site
+pnpm dev      # dev server at localhost:4321
+pnpm build    # type-check + production build
+pnpm preview  # preview the built site
 ```
