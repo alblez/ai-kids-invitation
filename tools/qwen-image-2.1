@@ -1,0 +1,120 @@
+#!/bin/bash
+# qwen-image-2.1 — generate or edit images with Qwen-Image-2.1 (Diffusers, MPS)
+# Uses the Python in ~/.local/share/qwen21-diffusers (override with PY=/path/to/python).
+# All arguments are passed as data to Python (argparse); nothing is interpolated.
+# One process per image (MPS NaN bug: diffusers #14859).
+set -euo pipefail
+
+PY="${PY:-$HOME/.local/share/qwen21-diffusers/bin/python}"
+
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" || $# -eq 0 ]]; then
+  cat <<'USAGE'
+qwen-image-2.1 — Qwen-Image-2.1 via Diffusers on Apple Silicon MPS
+
+Usage:
+  qwen-image-2.1 --prompt "..." --output out.png [options]
+
+Required:
+  --prompt TEXT       Image description (observational style for t2i, instruction for edits)
+  --output PATH       Output PNG path
+
+Options:
+  --width  N          Output width  (default 1024, multiple of 32)
+  --height N          Output height (default 1024, multiple of 32)
+  --steps  N          Denoising steps (default 40)
+  --seed   N          Random seed (default: random; actual seed always printed)
+  --ref    PATH       Reference image (repeat for multiple; 0 = text-to-image)
+  --res    N          output_resolution for ref encoding (default 768)
+
+Examples:
+  # Text-to-image
+  qwen-image-2.1 --prompt "A cat astronaut" --output cat.png --steps 4 --width 512 --height 512
+
+  # Reference editing (identity from ref image)
+  qwen-image-2.1 --prompt "Put <image1> in a superhero costume" --output hero.png --ref face.png
+
+Speed on M1 Max 64GB: ~21 min at 1024x1536 40 steps, ~30s/step.
+USAGE
+  exit 0
+fi
+
+export PYTORCH_ENABLE_MPS_FALLBACK=1
+exec "$PY" - "$@" <<'PYEOF'
+import argparse, resource, sys, time, types
+import torch
+import torch.nn.functional as F
+from PIL import Image
+
+p = argparse.ArgumentParser(prog="qwen-image-2.1")
+p.add_argument("--prompt", required=True)
+p.add_argument("--output", required=True)
+p.add_argument("--width", type=int, default=1024)
+p.add_argument("--height", type=int, default=1024)
+p.add_argument("--steps", type=int, default=40)
+p.add_argument("--seed", type=int, default=None)
+p.add_argument("--ref", action="append", default=[])
+p.add_argument("--res", type=int, default=768)
+args = p.parse_args()
+
+# Pick a seed if none given, and always report it
+if args.seed is None:
+    args.seed = int(torch.Generator("cpu").seed() % (2**31))
+print(f"Seed: {args.seed}", flush=True)
+
+from diffusers import QwenImage21Pipeline
+import diffusers.models.autoencoders.autoencoder_kl_qwenimage21 as vae_mod
+
+# MPS bug: F.pad on dim 2 of a 5-D tensor returns zeros when H*W >= 65536.
+# This corrupts every VAE-encoded reference image.
+# Upstream: QwenLM/Qwen-Image-2.1 #6, diffusers #14858.
+_orig_pad = F.pad
+def _pad(x, pad, mode="constant", value=None):
+    pad = tuple(pad)
+    if (x.device.type == "mps" and x.dim() == 5 and mode == "constant"
+            and not value and len(pad) == 6 and pad[:4] == (0, 0, 0, 0)):
+        zeros = lambda n: x.new_zeros(x.shape[0], x.shape[1], n, x.shape[3], x.shape[4])
+        return torch.cat(
+            ([zeros(pad[4])] if pad[4] else []) + [x] + ([zeros(pad[5])] if pad[5] else []),
+            dim=2,
+        )
+    return _orig_pad(x, pad, mode=mode, value=value)
+vae_mod.F = types.SimpleNamespace(
+    **{**{k: getattr(F, k) for k in dir(F) if not k.startswith("__")}, "pad": _pad}
+)
+
+pipe = QwenImage21Pipeline.from_pretrained("Qwen/Qwen-Image-2.1", dtype=torch.bfloat16)
+pipe.enable_model_cpu_offload(device="mps")
+
+stats = {"peak": 0.0, "t": [time.time()]}
+def on_step(p, i, t, kw):
+    torch.mps.synchronize()
+    stats["peak"] = max(stats["peak"], torch.mps.driver_allocated_memory() / 2**30)
+    stats["t"].append(time.time())
+    elapsed = stats["t"][-1] - stats["t"][-2]
+    print(f"  step {i+1}/{args.steps} ({elapsed:.1f}s)", flush=True)
+    return kw
+
+images = [Image.open(r) for r in args.ref] or None
+gen = torch.Generator("cpu").manual_seed(args.seed)
+
+start = time.time()
+img = pipe(
+    prompt=args.prompt, image=images,
+    width=args.width, height=args.height,
+    num_inference_steps=args.steps, output_resolution=args.res,
+    generator=gen, callback_on_step_end=on_step,
+).images[0]
+
+# RGBA: save as RGB when nearly all pixels are opaque (grey-background assets)
+hist = img.getchannel("A").histogram()
+transparent = "background is transparent" in args.prompt
+if not transparent and sum(hist[:250]) < 0.001 * img.width * img.height:
+    img = img.convert("RGB")
+img.save(args.output)
+
+dt = [b - a for a, b in zip(stats["t"][1:], stats["t"][2:])]
+total = time.time() - start
+print(f"Saved: {args.output} ({img.size[0]}x{img.size[1]} {img.mode})")
+print(f"Time: {total:.0f}s total, {sum(dt)/max(len(dt),1):.1f}s/step avg")
+print(f"Peak MPS: {stats['peak']:.1f} GB, RSS: {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 2**30:.1f} GB")
+PYEOF
