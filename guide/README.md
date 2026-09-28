@@ -4,9 +4,9 @@ How this invitation was built with AI agents, and how you can make one for your 
 
 ## Reading order
 
-1. **[The process](1-the-process.md)** — How the project was organized: ideation, roadmaps, image generation, validation, and delivery. Which AI models did what, how long it took, and the pitfalls you will hit.
+1. **[The process](1-the-process.md)** — How the project was organized: ideation, roadmaps, image generation, validation, and delivery. How to choose models for each role, how long it took, and the pitfalls you will hit.
 
-2. **[Make it yours](2-make-it-yours.md)** — Exact files and fields to change: child name, party details, WhatsApp number, images, OG preview, deployment. Privacy checklist before you publish.
+2. **[Make it yours](2-make-it-yours.md)** — First-run page: requirements, preflight, the config file (every field), photos folder, creating the cartoon master (three options with trade-offs), images per section, OG image, deployment, real-phone testing, and the privacy checklist.
 
 3. **[Prompts](3-prompts.md)** — Copy-ready prompts for each stage: ideation, roadmap writing, image generation, image validation, stage handoffs, and project review. Generalized with placeholder slots so you can fill in your own details.
 

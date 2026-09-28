@@ -23,16 +23,33 @@ This invitation was built over about four days by one parent supervising a team 
 
 The orchestrator may make small changes itself. The key rule is: one integration owner, and the agent that did the work never signs off on it.
 
-## Which models did what
+## Choosing models
 
-These are the models used in the original project. You can substitute whatever is available to you; the principle is matching the model to the risk level of the work.
+Match the model to the risk level of the work. These are criteria, not brand recommendations — substitute whatever is available to you.
 
-| Work | Model used | Why |
+| Work | What to use | Why |
 |---|---|---|
-| Orchestration (design, handoffs, monitoring) | Claude Opus 5.5, medium effort | Judgment across the whole project; high effort was slower without visible gain for this role |
-| Complex animation code, final verification | Claude Opus 5.5, high effort | Hardest reasoning; owns the publish step |
-| Copy writing, short one-shots | GPT 6 Sol | Fast: eight captions in 18 seconds |
-| Image generation | Qwen-Image-2.1, locally | Child's photos stay on the computer; hosted tools refused or blocked similar requests |
+| Orchestration (design, handoffs, monitoring) | An advanced model, medium effort | Judgment across the whole project; high effort was slower without visible gain for this role |
+| Complex animation code, final verification | An advanced model, high effort | Hardest reasoning; owns the publish step |
+| Copy writing, short one-shots | A fast model | Quick turnaround: a batch of captions in seconds |
+| Long mechanical work (image batches, extraction) | The cheapest capable model | Procedural work against a spec, not designing |
+| Validation | An advanced model of a **different family** from the executor | Independence matters more than cost; a weak validator misses real problems |
+| Image generation | An open local model, or a hosted image tool | The child's photos are the sensitive input; see the [images guide](4-images-with-qwen.md) |
+
+Older or cheaper models read instructions well but judged sources poorly in this project. Pair them with an advanced reviewer for any decision-changing work.
+
+**Examples as of 2026-09:** advanced models include Claude Opus 5.5 and GPT 6 Astra. Cheap/fast models include DeepSeek V4.1 Flash, GLM 5.3 Flash, and MiMo V2.6 Flash. Weigh cost against capability and use the subscriptions you already have.
+
+## What the original project used
+
+This is a record of the specific models and costs from the original build. It is not a recommendation.
+
+| Work | Model used |
+|---|---|
+| Orchestration (design, handoffs, monitoring) | Claude Opus 5.5, medium effort |
+| Complex animation code, final verification | Claude Opus 5.5, high effort |
+| Copy writing, short one-shots | GPT 6 Sol |
+| Image generation | Qwen-Image-2.1, locally on an M1 Max |
 
 
 

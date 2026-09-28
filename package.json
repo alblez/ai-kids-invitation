@@ -12,7 +12,8 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "og": "node --experimental-strip-types scripts/generate-og.mjs"
+    "og": "node --experimental-strip-types scripts/generate-og.mjs",
+    "preflight": "node scripts/preflight.mjs"
   },
   "dependencies": {
     "astro": "^7.3.3",
