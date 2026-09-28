@@ -1,0 +1,289 @@
+---
+/**
+ * Details section — party date, time, location.
+ * Gael points from a rooftop to his headquarters (decorative scene), above the facts card.
+ * Below fold: ScrollTrigger reveals + a one-shot route/marker. Links open address in Google Maps or Waze.
+ */
+import city from '../assets/details/det-city-01.webp';
+import gael from '../assets/details/det-gael-01.webp';
+
+interface PartyDetails {
+  date: string;
+  time: string;
+  venue: string;
+  address: string;
+  addressNote: string;
+  addressEncoded: string;
+}
+
+// Example details: replace with your party's date, time and place.
+const partyDetails: PartyDetails = {
+  date: 'Saturday, June 13, 2026',
+  time: '3:00 p.m. to 6:00 p.m.',
+  venue: 'Chelsea Piers Field House',
+  address: '62 Chelsea Piers, New York, NY 10011',
+  addressNote: 'Example venue: replace with your own',
+  addressEncoded: encodeURIComponent('Chelsea Piers Field House, 62 Chelsea Piers, New York, NY 10011'),
+};
+---
+
+<section
+  id="details"
+  class="relative py-20 px-4 md:px-8 max-w-2xl mx-auto text-center"
+>
+  <h2 class="details-title font-display text-4xl md:text-5xl text-star-yellow mb-6">
+    The mission is at my HQ!
+  </h2>
+
+  <!-- Decorative scene in the city plate's 1184x896 frame: finished state by default, removed if an image fails -->
+  <div class="details-scene relative -mx-4 md:mx-0 mb-8 overflow-hidden md:rounded-2xl bg-night-sky">
+    <img class="absolute inset-0 size-full" src={city.src} width={city.width} height={city.height} loading="lazy" decoding="async" alt="" />
+    <img class="details-gael absolute" src={gael.src} width={gael.width} height={gael.height} loading="lazy" decoding="async" alt="" />
+    <svg class="absolute inset-0 size-full" viewBox="0 0 1184 896" aria-hidden="true">
+      <!-- Fingertip (588, 477) -> hop over the roof gap -> HQ arched door (768, 594) -->
+      <path
+        class="details-route"
+        pathLength="1"
+        fill="none"
+        stroke="#fbbf24"
+        stroke-width="11"
+        stroke-linecap="round"
+        d="M592 482C618 512 636 536 662 526 690 515 684 400 718 400 752 400 764 480 768 540"
+      />
+      <circle class="details-tip" cx="592" cy="482" r="10" fill="#f8fafc" stroke="#0f172a" stroke-width="4" />
+      <!-- Star marker and its one-shot ring, centred on the HQ door (768, 594) -->
+      <g transform="translate(768 594) scale(1.15)">
+        <circle class="details-ring" r="50" fill="none" stroke="#fbbf24" stroke-width="7" />
+        <g class="details-marker">
+          <path
+            d="M0-50 15.3-21 47.6-15.5 24.7 8 29.4 40.5 0 26-29.4 40.5-24.7 8-47.6-15.5-15.3-21Z"
+            fill="#fbbf24"
+            stroke="#0f172a"
+            stroke-width="7"
+            stroke-linejoin="round"
+          />
+          <text class="font-display" y="15" text-anchor="middle" font-size="40" fill="#0f172a">4</text>
+        </g>
+      </g>
+    </svg>
+    <p class="details-bubble font-display">I'll be waiting here!</p>
+  </div>
+
+  <div class="details-card bg-hero-dark/50 backdrop-blur-sm rounded-2xl p-5 sm:p-8 border border-white/10">
+    <div class="space-y-6">
+      <div>
+        <p class="text-sm uppercase tracking-widest text-power-blue font-semibold mb-1">Date</p>
+        <p class="text-xl font-bold">{partyDetails.date}</p>
+      </div>
+
+      <div>
+        <p class="text-sm uppercase tracking-widest text-power-green font-semibold mb-1">Time</p>
+        <p class="text-xl font-bold">{partyDetails.time}</p>
+      </div>
+
+      <div>
+        <p class="text-sm uppercase tracking-widest text-power-red font-semibold mb-1">Place</p>
+        <p class="text-xl font-bold">{partyDetails.venue}</p>
+        <p class="text-white/60 text-sm mt-1">{partyDetails.address}</p>
+        <p class="text-white/40 text-sm">{partyDetails.addressNote}</p>
+      </div>
+    </div>
+
+    <!-- Map links -->
+    <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+      <a
+        href={`https://www.google.com/maps/search/?api=1&query=${partyDetails.addressEncoded}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center justify-center gap-2 bg-power-blue hover:bg-power-blue/80 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
+      >
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
+        </svg>
+        Google Maps
+      </a>
+      <a
+        href={`https://waze.com/ul?q=${partyDetails.addressEncoded}&navigate=yes`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center justify-center gap-2 bg-power-green hover:bg-power-green/80 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
+      >
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+        </svg>
+        Waze
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* The city plate's own frame; every overlay below is positioned in it, so registration holds at any width */
+  .details-scene {
+    aspect-ratio: 1184 / 896;
+    container-type: inline-size;
+  }
+  /* Gael master x0.62 -> box (126.3, 27.8) 496x620 in plate px: feet on the left ledge (y ~ 628), fingertip at (588, 477) */
+  .details-gael {
+    left: 10.667%;
+    top: 3.103%;
+    width: 41.892%;
+    transform-origin: 52% 96.8%; /* between his feet */
+  }
+  .details-route {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    filter: drop-shadow(0 0 3px rgb(15 23 42 / 0.9));
+  }
+  /* Transient effects: only the animation shows them */
+  .details-tip,
+  .details-ring {
+    visibility: hidden;
+  }
+  /* Speech bubble in the sky right of his hair (never on the face); the tail points to his mouth */
+  .details-bubble {
+    position: absolute;
+    left: 43%;
+    top: 9%;
+    padding: 0.35em 0.6em;
+    border-radius: 1em;
+    background: var(--color-web-white);
+    color: var(--color-night-sky);
+    font-size: 4.2cqw;
+    line-height: 1.1;
+    white-space: nowrap;
+    box-shadow: 3px 3px 0 var(--color-star-yellow);
+    transform-origin: 0 100%;
+  }
+  .details-bubble::after {
+    content: '';
+    position: absolute;
+    left: 0.4em;
+    bottom: -0.7em;
+    width: 1em;
+    height: 0.9em;
+    background: inherit;
+    clip-path: polygon(40% 0, 100% 0, 0 100%);
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+
+  // Essential content is not .gsap-hidden: GSAP hides it only once this module runs.
+  const ESSENTIAL = '.details-title, .details-card';
+  let reveal: ReturnType<typeof gsap.fromTo>[] = [];
+  try {
+    if (!reduce.matches) {
+      reveal = [
+        gsap.fromTo('.details-title', { autoAlpha: 0, y: 30 }, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.6,
+          scrollTrigger: { trigger: '#details', start: 'top 80%' },
+        }),
+        gsap.fromTo('.details-card', { autoAlpha: 0, y: 50 }, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.8,
+          delay: 0.2,
+          scrollTrigger: { trigger: '#details', start: 'top 80%' },
+        }),
+      ];
+      // Plain revert, not gsap.matchMedia: its ScrollTrigger refresh smooth-scrolls the page to the top.
+      reduce.addEventListener('change', () => reveal.forEach((t) => t.revert()), { once: true });
+    }
+  } catch {
+    reveal.forEach((t) => t.revert()); // also kills their ScrollTriggers, which would re-apply the hidden from-state
+    document.querySelectorAll(ESSENTIAL).forEach((el) => el.removeAttribute('style'));
+  }
+
+  // Any failure leaves (or restores) the finished scene; the facts card never depends on it.
+  try {
+    setupScene();
+  } catch { /* essential content is unaffected */ }
+
+  function setupScene() {
+    const scene = document.querySelector<HTMLElement>('.details-scene')!;
+    const imgs = [...scene.querySelectorAll('img')];
+    const [, character] = imgs;
+    const route = scene.querySelector<SVGPathElement>('.details-route')!;
+    const [ring, tip, marker, bubble] = ['.details-ring', '.details-tip', '.details-marker', '.details-bubble']
+      .map((s) => scene.querySelector(s)!);
+    const broken = (img: HTMLImageElement) => img.complete && !img.naturalWidth;
+    let tl: ReturnType<typeof gsap.timeline> | undefined;
+    let trigger: ScrollTrigger | undefined;
+
+    // Back to the finished defaults: route drawn, marker landed, no transient effects
+    function finish() {
+      trigger?.kill();
+      tl?.revert();
+      tl = undefined; // a decode that resolves later must not replay it
+      route.style.removeProperty('stroke-dashoffset'); // revert leaves GSAP's inline value on the SVG path
+    }
+    // A missing image drops the whole illustration: the card-only layout stays, no blank frame
+    function fail() {
+      finish();
+      scene.hidden = true;
+    }
+
+    imgs.forEach((img) => img.addEventListener('error', fail));
+    if (imgs.some(broken)) return fail();
+    if (reduce.matches) return;
+    reduce.addEventListener('change', () => reduce.matches && finish());
+
+    const length = route.getTotalLength();
+    gsap.set([marker, ring], { transformOrigin: '50% 50%' }); // once, before any tween: no origin smoothing jumps
+    tl = gsap.timeline({ paused: true }); // assigned before any tween, so a throw below can still revert what was prepared
+    try {
+      tl
+        // 1. Gael drops onto the ledge and squashes on landing
+        .fromTo(character, { autoAlpha: 0, yPercent: -14 }, { autoAlpha: 1, yPercent: 0, duration: 0.4, ease: 'power2.in' })
+        .to(character, { scaleX: 1.05, scaleY: 0.93, duration: 0.09, yoyo: true, repeat: 1, ease: 'power1.out' })
+        .fromTo(bubble, { autoAlpha: 0, scale: 0, rotation: -8 }, {
+          autoAlpha: 1, scale: 1, rotation: 0, duration: 0.35, ease: 'back.out(2)',
+        }, 0.45)
+        // 2. The route writes itself from his fingertip, a bright tip riding its head
+        .fromTo(route, { strokeDashoffset: 1 }, {
+          strokeDashoffset: 0,
+          duration: 1.15,
+          ease: 'power1.inOut',
+          onUpdate: () => {
+            const p = route.getPointAtLength(length * (1 - Number(gsap.getProperty(route, 'strokeDashoffset'))));
+            tip.setAttribute('cx', String(p.x));
+            tip.setAttribute('cy', String(p.y));
+          },
+        }, 0.55)
+        .set(tip, { autoAlpha: 1 }, 0.55)
+        .to(tip, { autoAlpha: 0, duration: 0.15 }, 1.6)
+        // 3. The marker lands on the HQ door, one shockwave, then holds (both scale around the door centre)
+        .fromTo(marker, { autoAlpha: 0, scale: 0, y: -70 }, {
+          autoAlpha: 1, scale: 1, y: 0, duration: 0.45, ease: 'back.out(2.5)',
+        }, 1.55)
+        .fromTo(ring, { autoAlpha: 1, scale: 0.5 }, {
+          autoAlpha: 0, scale: 2.2, duration: 0.6, ease: 'power2.out', immediateRender: false,
+        }, 2)
+        .to(marker, { scale: 1.15, duration: 0.1, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 2);
+
+      // Once, when the whole scene is in view; plays only after both images decode
+      trigger = ScrollTrigger.create({
+        trigger: scene,
+        start: 'center 65%',
+        once: true,
+        onEnter: () => {
+          imgs.forEach((img) => { img.loading = 'eager'; });
+          Promise.all(imgs.map((img) => img.decode())).then(
+            () => tl?.play(),
+            () => (imgs.some(broken) ? fail() : finish()),
+          );
+        },
+      });
+    } catch {
+      finish(); // back to the finished defaults
+    }
+  }
+</script>

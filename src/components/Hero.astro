@@ -1,0 +1,523 @@
+---
+/**
+ * Hero section — above the fold.
+ * Uses a plain GSAP timeline on load (no ScrollTrigger — fires immediately).
+ * Initial state set via CSS .gsap-hidden to prevent FOUC on slow connections.
+ */
+import swing600 from '../assets/hero/hero-swing-600.webp';
+import swing900 from '../assets/hero/hero-swing-900.webp';
+import swing1200 from '../assets/hero/hero-swing-1200.webp';
+import revealed600 from '../assets/hero/hero-revealed-600.webp';
+import revealed900 from '../assets/hero/hero-revealed-900.webp';
+import revealed1200 from '../assets/hero/hero-revealed-1200.webp';
+import web from '../assets/hero/hero-web.webp';
+import sky900 from '../assets/hero/hero-sky-900.webp';
+import sky1536 from '../assets/hero/hero-sky-1536.webp';
+
+// Rendered canvas width is 2 × the frame width (see the <style> block).
+const sizes = '(min-width: 1215px) 680px, (min-width: 768px) 56vw, 112vw';
+const swingSrcset = `${swing600.src} 600w, ${swing900.src} 900w, ${swing1200.src} 1200w`;
+const revealedSrcset = `${revealed600.src} 600w, ${revealed900.src} 900w, ${revealed1200.src} 1200w`;
+---
+
+<section
+  id="hero"
+  class="relative isolate min-h-svh flex flex-col md:flex-row items-center justify-center gap-4 md:gap-12 px-4 text-center overflow-hidden"
+>
+  <!-- Comic night sky (decorative): 3D rooftop plate, stars, corner web, searchlights; the moon is .hero-stage::before -->
+  <div class="hero-sky absolute inset-0 -z-10" aria-hidden="true">
+    <img class="hero-plate" src={sky1536.src} srcset={`${sky900.src} 900w, ${sky1536.src} 1536w`} sizes="(max-aspect-ratio: 4/3) 177svh, 100vw" width="1536" height="1152" fetchpriority="low" decoding="async" alt="" />
+    <svg class="absolute inset-0 size-full" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" fill="#f8fafc" opacity="0.7">
+      <circle cx="374" cy="456" r="2.5" /><circle cx="659" cy="581" r="2" /><circle cx="936" cy="341" r="1.5" /><circle cx="869" cy="73" r="2" /><circle cx="294" cy="606" r="2" /><circle cx="135" cy="349" r="2" /><circle cx="307" cy="480" r="1.5" /><circle cx="53" cy="375" r="1.5" /><circle cx="927" cy="302" r="2.5" /><circle cx="28" cy="340" r="2.5" /><circle cx="339" cy="166" r="3.5" /><circle cx="892" cy="89" r="2.5" /><circle cx="642" cy="206" r="3.5" /><circle cx="309" cy="149" r="2.5" /><circle cx="400" cy="623" r="2" /><circle cx="349" cy="596" r="1.5" /><circle cx="382" cy="55" r="3.5" /><circle cx="183" cy="383" r="2.5" /><circle cx="307" cy="595" r="1.5" /><circle cx="459" cy="222" r="3.5" /><circle cx="948" cy="222" r="1.5" /><circle cx="70" cy="73" r="1.5" /><circle cx="764" cy="182" r="2" /><circle cx="631" cy="51" r="3.5" /><circle cx="606" cy="265" r="2.5" /><circle cx="46" cy="135" r="2.5" />
+    </svg>
+    <svg class="hero-web-corner" viewBox="0 0 200 200" fill="none" stroke="#f8fafc" stroke-width="1.5">
+      <path d="M0 0L279 20M0 0L263 96M0 0L214 180M0 0L140 242M0 0L49 276M45 3Q38 8 42 15Q34 19 34 29Q25 30 23 39Q13 36 8 44M90 6Q76 16 85 31Q67 39 69 58Q50 59 45 78Q26 73 16 89M140 10Q118 25 132 48Q104 60 107 90Q77 92 70 121Q41 113 24 138M195 14Q164 35 183 67Q145 84 149 125Q108 128 98 169Q57 158 34 192" />
+    </svg>
+    <div class="hero-beam hero-beam-warm"></div>
+    <div class="hero-beam hero-beam-cool"></div>
+  </div>
+
+  <div class="flex flex-col items-center">
+    <p class="hero-subtitle gsap-hidden font-display text-2xl md:text-3xl mb-3">
+      You're invited!
+    </p>
+
+    <h1 class="hero-name gsap-hidden font-display text-[5.25rem] md:text-9xl lg:text-[10rem] text-hero-red leading-none mb-1">
+      Gael
+    </h1>
+
+    <p class="hero-age gsap-hidden font-display text-5xl md:text-7xl text-web-white">
+      is turning <span class="hero-four">4</span>!
+    </p>
+
+    <div class="hero-mask gsap-hidden mt-4 md:mt-6 flex gap-3">
+      <!-- Four comic stars, one per year: power colours plus the yellow of the big 4 -->
+      <span class="hero-star bg-power-blue" aria-hidden="true"></span>
+      <span class="hero-star bg-power-green" aria-hidden="true"></span>
+      <span class="hero-star bg-power-red" aria-hidden="true"></span>
+      <span class="hero-star bg-star-yellow" aria-hidden="true"></span>
+    </div>
+  </div>
+
+  <!-- Character frame: shows canvas region x 25-75 %, y 20-100 % of the 1200x1200 masters -->
+  <div class="hero-stage relative shrink-0">
+    <!-- Transient swing layer: strand behind HERO-001, moved as one unit -->
+    <div class="hero-swing hero-frame" aria-hidden="true">
+      <img class="hero-web" src={web.src} width={web.width} height={web.height} alt="" />
+      <img class="relative w-full h-auto" src={swing1200.src} srcset={swingSrcset} {sizes} width="1200" height="1200" alt="" />
+    </div>
+    <img
+      class="hero-portrait hero-frame gsap-hidden"
+      src={revealed1200.src}
+      srcset={revealedSrcset}
+      {sizes}
+      width="1200"
+      height="1200"
+      alt="Gael in a red and blue superhero suit, mask off and smiling, holding his mask"
+    />
+    <!-- Idle sparkles around Gael's head: invisible unless the idle loop runs -->
+    <span class="hero-sparkle" aria-hidden="true"></span>
+    <span class="hero-sparkle" aria-hidden="true"></span>
+    <span class="hero-sparkle" aria-hidden="true"></span>
+    <span class="hero-sparkle" aria-hidden="true"></span>
+    <!-- Replay: shown when the entrance ends (never under reduced motion); tapping Gael does the same -->
+    <button
+      type="button"
+      class="hero-replay font-display text-star-yellow focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+      hidden
+    >
+      <span class="hero-replay-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12a8 8 0 1 0 2.34-5.66M4 4v4.5h4.5" />
+        </svg>
+      </span>
+      Again!
+    </button>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="hero-scroll gsap-hidden absolute bottom-8 animate-bounce motion-reduce:animate-none">
+    <svg class="w-6 h-6 text-web-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+    </svg>
+  </div>
+</section>
+
+<style>
+  /* Night sky: the gradient is the fallback under the 3D plate; ::after adds a blue glow around Gael
+     and fades the rooftops into the page colour so Details starts without a seam. */
+  .hero-sky {
+    background: linear-gradient(#070b1f, #0f172a 55%, #1a1a3e);
+  }
+  .hero-sky::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 45% at 50% 55%, rgb(59 130 246 / 0.18), transparent 70%),
+      linear-gradient(transparent 82%, #0f172a);
+  }
+  .hero-plate {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 100%;
+  }
+  .hero-web-corner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: clamp(110px, 25vw, 320px);
+    opacity: 0.3;
+  }
+  /* Searchlights from the rooftops; they sweep only when motion is allowed */
+  .hero-beam {
+    position: absolute;
+    bottom: 8%;
+    width: clamp(120px, 22vw, 260px);
+    height: 95%;
+    clip-path: polygon(46% 100%, 54% 100%, 100% 0, 0 0);
+    transform-origin: 50% 100%;
+  }
+  .hero-beam-warm {
+    left: 4%;
+    background: linear-gradient(to top, rgb(251 191 36 / 0.3), rgb(251 191 36 / 0));
+    rotate: 14deg;
+  }
+  .hero-beam-cool {
+    right: 4%;
+    background: linear-gradient(to top, rgb(147 197 253 / 0.28), rgb(147 197 253 / 0));
+    rotate: -16deg;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-beam {
+      animation: hero-sweep 7s ease-in-out infinite alternate;
+    }
+    .hero-beam-cool {
+      animation-duration: 9s;
+      animation-direction: alternate-reverse;
+    }
+  }
+  @keyframes hero-sweep {
+    from { transform: rotate(-22deg); }
+    to { transform: rotate(18deg); }
+  }
+  /* Halftone comic moon behind Gael's head (frame units: head centre ~ 0.53w, 0.31w) */
+  .hero-stage::before {
+    content: '';
+    position: absolute;
+    z-index: -1; /* behind the text column's circles on phones, above the sky */
+    left: calc(var(--w) * 0.02);
+    top: calc(var(--w) * -0.18);
+    width: calc(var(--w) * 1.02);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle, rgb(217 119 6 / 0.35) 1.4px, transparent 1.9px) 0 0 / 7px 7px,
+      radial-gradient(circle at 38% 34%, #fefce8, #fde68a 55%, #fbbf24);
+    box-shadow: 0 0 40px 12px rgb(253 230 138 / 0.25);
+  }
+  /* Idle life after the entrance (.hero-idle is added by the script only; never under reduced motion).
+     Independent scale/rotate/translate properties so it composes with GSAP's inline transforms. */
+  .hero-sparkle {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: var(--color-web-white); /* white, so they read over the yellow moon too */
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .hero-sparkle:nth-of-type(1) { left: 6%; top: 5%; }
+  .hero-sparkle:nth-of-type(2) { left: 90%; top: 10%; width: 14px; height: 14px; }
+  .hero-sparkle:nth-of-type(3) { left: 12%; top: 33%; width: 12px; height: 12px; }
+  .hero-sparkle:nth-of-type(4) { left: 86%; top: 30%; }
+  @media (prefers-reduced-motion: no-preference) {
+    /* Breathing + a slow sway, pivoting between his feet (canvas y 1137 of 1200) */
+    .hero-idle .hero-portrait {
+      transform-origin: 50% 94.75%;
+      animation: hero-breathe 3.2s ease-in-out infinite;
+    }
+    .hero-idle .hero-name {
+      animation: hero-pop 6s ease-in-out 1s infinite;
+    }
+    .hero-idle .hero-mask span {
+      animation: hero-hop 4s ease-in-out infinite;
+    }
+    .hero-idle .hero-mask span:nth-child(2) { animation-delay: 0.15s; }
+    .hero-idle .hero-mask span:nth-child(3) { animation-delay: 0.3s; }
+    .hero-idle .hero-mask span:nth-child(4) { animation-delay: 0.45s; }
+    .hero-idle .hero-sparkle {
+      animation: hero-twinkle 2.4s ease-in-out infinite;
+    }
+    .hero-idle .hero-sparkle:nth-of-type(2) { animation-delay: 0.6s; }
+    .hero-idle .hero-sparkle:nth-of-type(3) { animation-delay: 1.3s; }
+    .hero-idle .hero-sparkle:nth-of-type(4) { animation-delay: 1.9s; }
+    .hero-idle .hero-scroll {
+      animation: hero-nudge 5s ease-in-out 2s infinite;
+    }
+  }
+  @keyframes hero-breathe {
+    0%, 100% { scale: 1; rotate: 0deg; }
+    25% { scale: 1.015 1.03; rotate: 1.2deg; }
+    50% { scale: 1; rotate: 0deg; }
+    75% { scale: 1.015 1.03; rotate: -1.2deg; }
+  }
+  /* Scale only: the title keeps its static comic tilt (rotate) */
+  @keyframes hero-pop {
+    0%, 84%, 100% { scale: 1; }
+    88% { scale: 1.12; }
+    92% { scale: 0.96; }
+    96% { scale: 1.03; }
+  }
+  @keyframes hero-hop {
+    0%, 70%, 100% { translate: 0 0; }
+    78% { translate: 0 -10px; }
+    86% { translate: 0 0; }
+  }
+  @keyframes hero-twinkle {
+    0%, 100% { opacity: 0; scale: 0.3; rotate: 0deg; }
+    50% { opacity: 1; scale: 1; rotate: 45deg; }
+  }
+  @keyframes hero-nudge {
+    0%, 80%, 100% { translate: 0 0; }
+    85% { translate: 0 8px; }
+    90% { translate: 0 0; }
+    95% { translate: 0 5px; }
+  }
+  /* "You're invited!" as a speech bubble, like Details and RSVP */
+  .hero-subtitle {
+    position: relative;
+    padding: 0.2em 0.6em 0.15em;
+    border-radius: 1em;
+    background: var(--color-web-white);
+    color: var(--color-night-sky);
+    line-height: 1.1;
+    letter-spacing: 0.03em;
+    box-shadow: 3px 3px 0 var(--color-star-yellow);
+    rotate: -3deg;
+  }
+  .hero-subtitle::after {
+    content: '';
+    position: absolute;
+    left: 58%;
+    bottom: -0.55em;
+    width: 0.9em;
+    height: 0.7em;
+    background: inherit;
+    clip-path: polygon(0 0, 100% 0, 20% 100%);
+  }
+  /* Comic logo: dark outline under the fill, yellow extrusion */
+  .hero-name {
+    -webkit-text-stroke: 0.1em var(--color-night-sky);
+    paint-order: stroke fill;
+    text-shadow: 0.05em 0.05em 0 var(--color-star-yellow), 0.08em 0.08em 0 var(--color-night-sky);
+    letter-spacing: 0.02em;
+    rotate: -4deg;
+  }
+  .hero-age {
+    -webkit-text-stroke: 0.12em var(--color-hero-blue);
+    paint-order: stroke fill;
+    text-shadow: 0.06em 0.06em 0 var(--color-power-blue);
+    line-height: 1;
+  }
+  .hero-four {
+    display: inline-block;
+    font-size: 1.45em;
+    line-height: 0.8;
+    color: var(--color-star-yellow);
+    -webkit-text-stroke-color: var(--color-night-sky);
+    text-shadow: 0.05em 0.05em 0 var(--color-hero-red);
+    rotate: 8deg;
+  }
+  .hero-star {
+    display: inline-block;
+    width: 34px;
+    height: 34px;
+    clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  }
+  .hero-stage {
+    --w: min(56vw, 30svh, 300px);
+    width: var(--w);
+    height: calc(var(--w) * 1.6);
+  }
+  @media (min-width: 768px) {
+    .hero-stage {
+      --w: min(28vw, 42svh, 340px);
+    }
+  }
+  /* Full 1200x1200 canvas at 2x the frame width, offset so the frame crops its transparent margins. */
+  .hero-frame {
+    position: absolute;
+    left: -50%;
+    top: -25%;
+    width: 200%;
+    max-width: none;
+    height: auto;
+    aspect-ratio: 1;
+  }
+  /* Hidden without depending on .js: only a successful swing reveals it. */
+  .hero-swing {
+    visibility: hidden;
+  }
+  /* HERO-003 placed at (335, -485) in HERO-001 canvas pixels so its tip sits behind the fist. */
+  .hero-web {
+    position: absolute;
+    left: 27.917%;
+    top: -40.417%;
+    width: 33.333%;
+    height: auto;
+  }
+  /* Right of the frame, in the side margin (>= 87 px at 375 px) so it never covers Gael or the text. */
+  .hero-replay {
+    position: absolute;
+    left: calc(100% + 4px);
+    bottom: 12%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    border-radius: 12px;
+    font-size: 17px;
+    line-height: 1;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .hero-replay-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 9999px;
+    background: var(--color-star-yellow);
+    color: var(--color-night-sky);
+    box-shadow: 3px 3px 0 var(--color-hero-red);
+  }
+  .hero-replay-icon svg {
+    width: 26px;
+    height: 26px;
+  }
+  .hero-stage:has(> .hero-replay:not([hidden])) {
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  document.documentElement.dataset.anim = '1';
+
+  const ESSENTIALS = '.hero-subtitle, .hero-name, .hero-age, .hero-mask, .hero-mask span, .hero-scroll, .hero-portrait';
+  let mm: ReturnType<typeof gsap.matchMedia> | undefined;
+
+  // Post-signal failure: reveal essentials with plain DOM, independent of GSAP state and of the setup below.
+  function recover() {
+    try { mm?.revert(); } catch { /* recovering anyway */ }
+    document.querySelectorAll<HTMLElement>(ESSENTIALS).forEach((el) => {
+      el.removeAttribute('style');
+      el.classList.remove('gsap-hidden');
+    });
+    document.querySelector('.hero-swing')?.removeAttribute('style');
+    document.querySelector('.hero-scroll')?.classList.remove('animate-bounce');
+  }
+
+  try {
+    const stage = document.querySelector<HTMLElement>('.hero-stage')!;
+    const swing = document.querySelector<HTMLElement>('.hero-swing')!;
+    const portrait = document.querySelector<HTMLImageElement>('.hero-portrait')!;
+    const scroll = document.querySelector<HTMLElement>('.hero-scroll')!;
+    const again = document.querySelector<HTMLButtonElement>('.hero-replay')!;
+    const hero = document.getElementById('hero')!;
+
+    // Broken portrait: drop the canvas offset so its alt text sits inside the frame, not over the circles.
+    const onBroken = () => portrait.classList.remove('hero-frame');
+    if (portrait.complete && !portrait.naturalWidth) onBroken();
+    else portrait.addEventListener('error', onBroken);
+
+    const media = gsap.matchMedia();
+    mm = media;
+    let done = false;
+    let canSwing = false; // MotionPath registered and swing images decoded
+    let replay: (() => void) | undefined; // only set in the full-motion branch
+
+    const showFinal = () => {
+      gsap.set(ESSENTIALS, { autoAlpha: 1 });
+      scroll.classList.remove('animate-bounce');
+      done = true;
+    };
+
+    // The button (and the click on Gael's frame, which it bubbles to) restarts the entrance; latest tap wins.
+    stage.addEventListener('click', () => {
+      if (done) replay?.();
+    });
+
+    media.add('(prefers-reduced-motion: reduce)', showFinal);
+
+    media.add('(prefers-reduced-motion: no-preference)', (context) => {
+      let cancelled = false;
+      let running: gsap.core.Animation[] = [];
+
+      const finish = () => {
+        scroll.classList.remove('animate-bounce');
+        hero.classList.add('hero-idle');
+        done = true;
+        if (!again.hidden) return;
+        again.hidden = false;
+        gsap.fromTo(again, { scale: 0 }, { scale: 1, duration: 0.4, ease: 'back.out(2)' });
+      };
+
+      // Hero uses a load-time timeline, NOT ScrollTrigger.
+      // Explicit autoAlpha: 0 from-states so a replay restarts from the same first frame.
+      const text = () =>
+        gsap.timeline({ defaults: { ease: 'back.out(1.7)' } })
+          .fromTo('.hero-subtitle', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.6 }, 0.2)
+          .fromTo('.hero-name', { autoAlpha: 0, scale: 0.5 }, { autoAlpha: 1, scale: 1, duration: 0.8 }, 0.5)
+          .fromTo('.hero-age', { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.6 }, 0.9)
+          .fromTo('.hero-mask', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5 }, 1.2)
+          .fromTo('.hero-mask span', { scale: 0 }, { scale: 1, stagger: 0.1, duration: 0.4 }, 1.2)
+          .fromTo('.hero-scroll', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, 1.6);
+
+      // Swing in and reveal the portrait; without the swing (plugin/images failed) the portrait fades in place.
+      // Called inside context.add() so the matchMedia branch reverts it.
+      const arrive = (delay: number) => {
+        if (!canSwing) {
+          running.push(gsap.fromTo(portrait, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, delay, ease: 'none', onComplete: finish }));
+          return;
+        }
+        const R = Math.max(innerWidth, innerHeight) * 0.9;
+        const at = (deg: number) => {
+          const t = (deg * Math.PI) / 180;
+          return { x: R * Math.sin(t), y: -R * (1 - Math.cos(t)) };
+        };
+        // Back-swing past the bottom limited to 20 % of the viewport width so he never leaves a phone screen.
+        const back = -(Math.asin(Math.min(1, (0.2 * innerWidth) / R)) * 180) / Math.PI;
+        // fromCurrent: false — otherwise GSAP prepends the resting (0, 0) and the layer loops out and back.
+        // Swing down through the bottom, past it to the left, then settle back to the bottom (~1.6 s).
+        running.push(gsap.timeline({ delay, onComplete: finish })
+          .set(swing, { autoAlpha: 1, transformOrigin: '44.75% 25.8%' })
+          .fromTo(swing, { rotation: -10 }, {
+            rotation: 4,
+            motionPath: { path: [at(60), at(30), at(0), at(back)], curviness: 1.2, fromCurrent: false },
+            duration: 1.1,
+            ease: 'power1.inOut',
+          })
+          .fromTo(swing, { rotation: 4 }, {
+            rotation: 0,
+            motionPath: { path: [at(back), at(back / 2), at(0)], curviness: 1.2, fromCurrent: false },
+            duration: 0.5,
+            ease: 'sine.inOut',
+            immediateRender: false,
+          })
+          .fromTo(portrait, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, ease: 'none' })
+          .to(swing, { autoAlpha: 0, duration: 0.4, ease: 'none' }, '<')
+          .fromTo('.hero-age', { scale: 0.96 }, { scale: 1, duration: 0.3, ease: 'back.out(3)', immediateRender: false }, '<'));
+      };
+
+      replay = () => context.add(() => {
+        running.forEach((a) => a.kill());
+        running = [text()];
+        gsap.set([swing, portrait], { autoAlpha: 0 });
+        scroll.classList.add('animate-bounce');
+        hero.classList.remove('hero-idle');
+        arrive(1);
+      });
+
+      const cleanup = () => {
+        cancelled = true;
+        replay = undefined;
+        again.hidden = true;
+        hero.classList.remove('hero-idle');
+      };
+
+      // Preference flipped after the entrance already ran: restore the end state; replay and idle return.
+      if (done) {
+        showFinal();
+        finish();
+        return cleanup;
+      }
+
+      running = [text()];
+      const images = [...swing.querySelectorAll('img')].map((img) => img.decode());
+      const timeout = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('swing timeout')), 2500));
+      Promise.race([Promise.all([import('gsap/MotionPathPlugin'), ...images]), timeout])
+        .then(([{ MotionPathPlugin }]) => {
+          if (cancelled) return;
+          gsap.registerPlugin(MotionPathPlugin);
+          canSwing = true;
+          const delay = Math.max(0, 1 - running[0].time());
+          context.add(() => arrive(delay));
+        })
+        .catch(() => {
+          canSwing = false;
+          if (!cancelled) context.add(() => arrive(0));
+        })
+        .catch(recover);
+
+      return cleanup;
+    });
+  } catch {
+    recover();
+  }
+</script>

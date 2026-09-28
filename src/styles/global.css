@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+/*
+ * Theme: superhero
+ * Colors: hero red/blue, power colours green/blue/red
+ * Typography: comic-book style (Bangers + Nunito, self-hosted)
+ */
+
+@theme {
+  /* Hero palette */
+  --color-hero-red: #e23636;
+  --color-hero-blue: #2c3e8c;
+  --color-hero-dark: #1a1a2e;
+
+  /* Power colours */
+  --color-power-blue: #3b82f6;
+  --color-power-green: #22c55e;
+  --color-power-red: #ef4444;
+
+  /* Shared */
+  --color-night-sky: #0f172a;
+  --color-city-gray: #334155;
+  --color-star-yellow: #fbbf24;
+  --color-web-white: #f8fafc;
+
+  /* Typography */
+  --font-display: var(--font-bangers), cursive;
+  --font-body: var(--font-nunito), sans-serif;
+}
+
+/*
+ * GSAP animation-ready: elements start hidden to prevent FOUC.
+ * The .js class is added by an inline script and removed after 3s if
+ * animations never initialize, so content stays visible without JS.
+ */
+.js .gsap-hidden {
+  visibility: hidden;
+}

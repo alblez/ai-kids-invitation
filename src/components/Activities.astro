@@ -1,0 +1,406 @@
+---
+/**
+ * Activities section — science adventure party program.
+ * Managed by an agency. Below fold: staggered ScrollTrigger reveals.
+ * Superpower experiment: sticky scrubbed track with colour buttons.
+ */
+import scientist from '../assets/activities/act-r01w-scientist.webp';
+import cat from '../assets/activities/act-r02w-cat.webp';
+import lizard from '../assets/activities/act-r03w-lizard.webp';
+import owl from '../assets/activities/act-r04w-owl.webp';
+
+// Each costume reveals one party activity; balloon twisting is the prize.
+const prize = { emoji: '🎈', headline: 'A prize for you!', line: "As a prize, you'll get a balloon animal to take home." };
+
+// Pose order is the phase index: 0 scientist, 1 blue, 2 green, 3 red.
+const poses = [
+  { img: scientist, costume: 'none', alt: 'Gael as a scientist, with lab goggles on his forehead and a beaker in his hands' },
+  { img: cat, costume: 'blue', alt: 'Gael in a blue cat costume' },
+  { img: lizard, costume: 'green', alt: 'Gael in a green lizard costume' },
+  { img: owl, costume: 'red', alt: 'Gael in a red costume with wings' },
+];
+
+const powers = [
+  { power: 'blue', label: 'Blue', colors: 'bg-power-blue text-white', icon: 'M3 21V3l6 6h6l6-6v18Z', emoji: '🫧', headline: 'Bubbles to the sky!', line: "At the party, you'll play with bubbles that float up and up." },
+  { power: 'green', label: 'Green', colors: 'bg-power-green text-night-sky', icon: 'M4 5c9 0 16 5 16 11 0 4-3 6-6 6s-4-2-3-4c2 1 5 0 5-3 0-4-5-7-12-7Z', emoji: '🧪', headline: 'Sticky power!', line: "At the party, you'll play with squishy slime." },
+  { power: 'red', label: 'Red', colors: 'bg-power-red text-white', icon: 'M1 9c6-6 14-7 22-5-2 3-5 4-8 4 2 1 4 1 6 1-3 3-6 4-10 3 1 2 3 3 5 3-6 3-12 1-15-6Z', emoji: '🦉', headline: 'Hero mask!', line: "At face painting, they'll paint a hero mask on you." },
+];
+---
+
+<section
+  id="activities"
+  class="relative py-20 px-4 md:px-8 max-w-2xl mx-auto"
+>
+  <!-- Section title -->
+  <h2 class="activities-title font-display text-4xl md:text-5xl text-power-green mb-4 text-center">
+    🧪 Gael's Lab
+  </h2>
+
+  <!-- Adventure intro -->
+  <div class="activity-intro text-center mb-12">
+    <p class="font-display text-2xl md:text-3xl text-star-yellow mb-2">
+      Mix colours and powers!
+    </p>
+    <p class="text-white/70 text-lg max-w-md mx-auto">
+      Step into Gael's lab. Pick a colour, watch him become a hero, and discover the power you'll try at the party.
+    </p>
+  </div>
+
+  <!-- Superpower experiment: stays hidden (no space, no focus stops) until its script and all four images are ready -->
+  <div class="experiment-track" hidden>
+    <div class="experiment-sticky">
+      <div class="experiment-scene flex flex-col items-center gap-3">
+        <p id="experiment-hint" class="font-display text-2xl md:text-3xl text-star-yellow">Pick a colour!</p>
+        <div class="flex flex-wrap justify-center gap-3" role="group" aria-labelledby="experiment-hint">
+          {powers.map((p) => (
+            <button
+              type="button"
+              data-power={p.power}
+              data-headline={`${p.emoji} ${p.headline}`}
+              data-line={p.line}
+              aria-pressed="false"
+              class={`${p.colors} inline-flex items-center gap-2 min-h-12 px-4 rounded-full font-display text-2xl tracking-wide shadow-lg transition-transform active:scale-95 aria-pressed:scale-95 aria-pressed:ring-4 aria-pressed:ring-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white`}
+            >
+              <svg class="size-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={p.icon} /></svg>
+              {p.label}
+            </button>
+          ))}
+        </div>
+        <div class="experiment-character relative">
+          {poses.map((pose, i) => (
+            <img
+              data-costume={pose.costume}
+              class="absolute inset-0 size-full"
+              src={pose.img.src}
+              width={pose.img.width}
+              height={pose.img.height}
+              loading="lazy"
+              decoding="async"
+              alt={pose.alt}
+              style={i ? 'visibility: hidden' : undefined}
+              aria-hidden={i ? 'true' : undefined}
+            />
+          ))}
+          <div class="experiment-reactions absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+            {Array.from({ length: 12 }, () => <span />)}
+          </div>
+        </div>
+        <!-- Visual only: the activity list below carries the same text for screen readers -->
+        <p class="experiment-caption invisible min-h-20 max-w-xs text-center" aria-hidden="true">
+          <span class="block font-display text-2xl md:text-3xl text-star-yellow"></span>
+          <span class="block text-white/80"></span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activities: the list without the experiment; once the experiment runs it is screen-reader only -->
+  <ul class="activity-list grid gap-4">
+    {powers.map((p) => (
+      <li class="activity-item flex items-center gap-4 bg-hero-dark/50 backdrop-blur-sm rounded-xl p-5 border border-white/10 text-left">
+        <span class="text-4xl shrink-0" aria-hidden="true">{p.emoji}</span>
+        <div>
+          <p class="font-bold text-lg">{p.headline}</p>
+          <p class="text-white/60 text-sm">{p.line}</p>
+        </div>
+      </li>
+    ))}
+  </ul>
+
+  <!-- Prize: always visible, closes the section -->
+  <div class="activity-prize mt-8 flex items-center gap-4 bg-hero-dark/50 backdrop-blur-sm rounded-xl p-5 border border-star-yellow/40 text-left">
+    <span class="text-4xl shrink-0" aria-hidden="true">{prize.emoji}</span>
+    <div>
+      <p class="font-display text-2xl text-star-yellow">{prize.headline}</p>
+      <p class="text-white/70">{prize.line}</p>
+    </div>
+  </div>
+
+</section>
+
+<style>
+  /* 200svh of pinned scroll: three wipes with holds. */
+  .experiment-track {
+    height: 300svh;
+  }
+  .experiment-sticky {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* Only a successful setup reveals the scene (GSAP autoAlpha). */
+  .experiment-scene {
+    visibility: hidden;
+  }
+  .experiment-character {
+    width: min(280px, 75vw, calc((100svh - 14rem) * 5 / 6));
+    aspect-ratio: 5 / 6;
+  }
+  @media (min-width: 768px) {
+    .experiment-character {
+      width: min(360px, calc((100svh - 16rem) * 5 / 6));
+    }
+  }
+  /* Reaction pool, positioned at the beaker (51 %, 53.75 % of the canvas). */
+  .experiment-reactions span {
+    position: absolute;
+    left: 51%;
+    top: 53.75%;
+    visibility: hidden;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  let cards: ReturnType<typeof gsap.fromTo> | undefined;
+  // Essential content is not .gsap-hidden: GSAP hides it only once this module runs.
+  try {
+    gsap.fromTo('.activities-title', { autoAlpha: 0, y: 30 }, {
+      autoAlpha: 1,
+      y: 0,
+      duration: 0.6,
+      scrollTrigger: { trigger: '#activities', start: 'top 80%' },
+    });
+
+    gsap.fromTo('.activity-intro', { autoAlpha: 0, y: 20 }, {
+      autoAlpha: 1,
+      y: 0,
+      duration: 0.6,
+      scrollTrigger: { trigger: '.activity-intro', start: 'top 85%' },
+    });
+
+    // Stagger activity cards (screen-reader only once the experiment runs), then the prize
+    cards = gsap.fromTo('.activity-item', { autoAlpha: 0, x: -40 }, {
+      autoAlpha: 1,
+      x: 0,
+      duration: 0.5,
+      stagger: 0.12,
+      scrollTrigger: { trigger: '.activity-item', start: 'top 85%' },
+    });
+
+    gsap.fromTo('.activity-prize', { autoAlpha: 0, y: 20 }, {
+      autoAlpha: 1,
+      y: 0,
+      duration: 0.5,
+      scrollTrigger: { trigger: '.activity-prize', start: 'top 85%' },
+    });
+  } catch {
+    document.querySelectorAll('.activities-title, .activity-intro, .activity-item, .activity-prize').forEach((el) => el.removeAttribute('style'));
+  }
+
+  // Any failure leaves the experiment track with its hidden attribute.
+  try {
+    setupExperiment();
+  } catch { /* essential content is unaffected */ }
+
+  function setupExperiment() {
+    const track = document.querySelector<HTMLElement>('.experiment-track')!;
+    const list = document.querySelector<HTMLElement>('.activity-list')!; // collapses to screen-reader only on reveal
+    const prize = document.querySelector<HTMLElement>('.activity-prize')!; // first content that keeps its box below the track
+    const scene = track.querySelector<HTMLElement>('.experiment-scene')!;
+    const layers = [...track.querySelectorAll<HTMLImageElement>('[data-costume]')];
+    const buttons = [...track.querySelectorAll<HTMLButtonElement>('[data-power]')];
+    const sparks = [...track.querySelectorAll<HTMLElement>('.experiment-reactions span')];
+    const caption = track.querySelector<HTMLElement>('.experiment-caption')!;
+    const [captionHeadline, captionLine] = caption.children as unknown as HTMLElement[];
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+    const ORIGIN = 'circle farthest-corner at 51% 53.75%'; // ACT-R01 beaker centre (510, 645)
+    const WIPES = [[0.1, 0.25], [0.35, 0.5], [0.6, 0.75]];
+    const rnd = gsap.utils.random;
+
+    let pressed = 0; // fully shown pose: drives aria-pressed and reactions
+    let shown = 0; // pose a tap wipe starts from
+    let tapped: number | null = null; // button selection, held until native scroll moves
+    let lastProgress = -1;
+    let wipe: ReturnType<typeof gsap.to> | undefined;
+    let reaction: ReturnType<typeof gsap.timeline> | undefined;
+
+    // Pose `to` inside a disc of radius f around the beaker, pose `from` outside it, the rest hidden.
+    function render(from: number, to: number, f: number) {
+      if (from === to) f = 1;
+      const r = f * 101 - 1;
+      layers.forEach((img, i) => {
+        const inside = i === to && f > 0 && f < 1;
+        const outside = i === from && f > 0 && f < 1;
+        const mask = inside
+          ? `radial-gradient(${ORIGIN}, #000 ${r}%, transparent ${r + 1}%)`
+          : outside ? `radial-gradient(${ORIGIN}, transparent ${r}%, #000 ${r + 1}%)` : '';
+        img.style.visibility = inside || outside || i === (f >= 1 ? to : from) ? 'visible' : 'hidden';
+        img.style.setProperty('mask-image', mask);
+        img.style.setProperty('-webkit-mask-image', mask);
+      });
+    }
+
+    function select(k: number) {
+      pressed = k;
+      buttons.forEach((b, i) => b.setAttribute('aria-pressed', String(i + 1 === k)));
+      layers.forEach((img, i) => (i === k ? img.removeAttribute('aria-hidden') : img.setAttribute('aria-hidden', 'true')));
+    }
+
+    function arrive(k: number) {
+      if (!k) {
+        gsap.set(caption, { autoAlpha: 0 });
+        return;
+      }
+      captionHeadline.textContent = buttons[k - 1].dataset.headline!;
+      captionLine.textContent = buttons[k - 1].dataset.line!;
+      if (reduce.matches) gsap.set(caption, { autoAlpha: 1 });
+      else gsap.fromTo(caption, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.3 });
+      react(k);
+    }
+
+    function react(k: number) {
+      reaction?.kill();
+      gsap.set(sparks, { clearProps: 'all' });
+      if (!k || reduce.matches) return;
+      const tl = gsap.timeline({ onComplete: () => gsap.set(sparks, { clearProps: 'all' }) });
+      const base = { xPercent: -50, yPercent: -50, autoAlpha: 1 };
+      if (k === 1) {
+        // Bubbles rise from the beaker
+        sparks.slice(0, 8).forEach((s, i) => {
+          const d = rnd(10, 20);
+          tl.fromTo(s, { ...base, width: d, height: d, borderRadius: '50%', border: '2px solid #bfdbfe', background: 'rgba(59, 130, 246, 0.35)', x: rnd(-40, 40), y: 0, scale: 0.4 },
+            { x: `+=${rnd(-30, 30)}`, y: -rnd(70, 130), scale: 1, autoAlpha: 0, duration: rnd(0.6, 0.9), ease: 'power1.out' }, i * 0.03);
+        });
+      } else if (k === 2) {
+        // Slime blobs wobble and sink
+        sparks.slice(0, 4).forEach((s, i) => {
+          const d = rnd(26, 34);
+          tl.fromTo(s, { ...base, width: d, height: d, borderRadius: '45% 55% 50% 50%', background: ['#22c55e', '#4ade80', '#16a34a', '#86efac'][i], x: (i - 1.5) * 34, y: rnd(-10, 10), scaleX: 1, scaleY: 1 },
+            { scaleX: 1.6, scaleY: 0.7, duration: 0.25, ease: 'sine.out' }, i * 0.05)
+            .to(s, { scaleX: 0.8, scaleY: 1.1, y: '+=20', autoAlpha: 0, duration: rnd(0.4, 0.55), ease: 'sine.in' }, '>');
+        });
+      } else {
+        // Confetti bursts outward
+        sparks.forEach((s, i) => {
+          const a = (i / 12) * Math.PI * 2 + rnd(-0.2, 0.2);
+          const dist = rnd(70, 120);
+          const d = rnd(8, 12);
+          tl.fromTo(s, { ...base, width: d, height: d, borderRadius: i % 2 ? '50%' : '2px', background: ['#ef4444', '#fbbf24', '#f87171'][i % 3], x: 0, y: 0, rotation: 0 },
+            { x: Math.cos(a) * dist, y: Math.sin(a) * dist, rotation: rnd(-270, 270), autoAlpha: 0, duration: rnd(0.6, 0.9), ease: 'power2.out' }, 0);
+        });
+      }
+      reaction = tl;
+    }
+
+    // Proxy progress 0-1 -> phase 0-3: three wipe intervals separated by holds.
+    const phaseAt = (p: number) => {
+      const phase = WIPES.reduce((sum, [a, b]) => sum + gsap.utils.clamp(0, 1, (p - a) / (b - a)), 0);
+      return reduce.matches ? Math.round(phase) : phase;
+    };
+
+    function showScroll(phase: number) {
+      const from = Math.min(Math.floor(phase), 2);
+      const f = phase - from;
+      render(from, from + 1, f);
+      shown = Math.round(phase);
+      if (f === 0 || f === 1) {
+        const k = from + f;
+        if (k !== pressed) {
+          select(k);
+          arrive(k);
+        }
+      }
+    }
+
+    function tap(k: number) {
+      const target = k === pressed ? 0 : k; // pressing the pressed button returns to the scientist
+      const from = shown;
+      tapped = shown = target;
+      wipe?.kill();
+      react(0); // latest input wins: stop the previous reaction
+      select(target);
+      if (reduce.matches || from === target) {
+        render(from, target, 1);
+        arrive(target);
+        return;
+      }
+      const w = { f: 0 };
+      wipe = gsap.to(w, {
+        f: 1,
+        duration: 0.3,
+        ease: 'power2.out',
+        onUpdate: () => render(from, target, w.f),
+        onComplete: () => arrive(target),
+      });
+    }
+
+    buttons.forEach((b, i) => b.addEventListener('click', () => tap(i + 1)));
+    layers.forEach((img) => img.addEventListener('error', () => { img.style.display = 'none'; }));
+
+    function reveal(above: boolean) {
+      try {
+        const before = prize.getBoundingClientRect().top;
+        track.hidden = false;
+        // The experiment now shows each activity: keep the list for screen readers only, fully visible to them.
+        list.classList.add('sr-only');
+        cards?.scrollTrigger?.kill();
+        gsap.set('.activity-item', { clearProps: 'all' });
+        // Inserted above the reader (fast scroll or reload): keep what is on screen still.
+        // Browsers with scroll anchoring already did this, so the measured difference is 0.
+        if (above) window.scrollBy({ top: prize.getBoundingClientRect().top - before, behavior: 'instant' });
+
+        const proxy = { p: 0 };
+        gsap.to(proxy, {
+          p: 1,
+          ease: 'none',
+          onUpdate: () => {
+            if (tapped === null) showScroll(phaseAt(proxy.p));
+          },
+          scrollTrigger: {
+            trigger: track,
+            start: 'top top',
+            end: 'bottom bottom',
+            scrub: true,
+            onUpdate: (self) => {
+              if (self.progress === lastProgress) return; // refresh/tween tick: keep a button selection
+              lastProgress = self.progress;
+              tapped = null;
+              wipe?.kill();
+              showScroll(phaseAt(self.progress));
+            },
+          },
+        });
+        ScrollTrigger.refresh();
+
+        if (reduce.matches) gsap.set(scene, { autoAlpha: 1 });
+        else gsap.fromTo(scene, { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power2.out' });
+      } catch {
+        track.hidden = true;
+        list.classList.remove('sr-only');
+        ScrollTrigger.refresh();
+      }
+    }
+
+    // Reveal only while everything that changes (track in, list out) is off screen, so the page never jumps under the reader.
+    function waitToReveal() {
+      const check = () => {
+        const below = list.getBoundingClientRect().top > innerHeight;
+        const above = prize.getBoundingClientRect().top < 0;
+        if (!below && !above) return;
+        removeEventListener('scroll', check);
+        reveal(above);
+      };
+      addEventListener('scroll', check, { passive: true });
+      check();
+    }
+
+    // Start loading about two viewports before Activities; hidden lazy images would never load on their own.
+    ScrollTrigger.create({
+      trigger: '#activities',
+      start: () => `top bottom+=${innerHeight}`,
+      end: 'max',
+      once: true,
+      onEnter: () => {
+        layers.forEach((img) => { img.loading = 'eager'; });
+        Promise.all(layers.map((img) => img.decode())).then(waitToReveal, () => { /* stay hidden */ });
+      },
+    });
+  }
+</script>

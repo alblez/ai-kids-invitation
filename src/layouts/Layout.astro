@@ -1,0 +1,53 @@
+---
+import { Font } from 'astro:assets';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Gael is turning 4! 🎉',
+  description = "You're invited to Gael's birthday party. Come celebrate with us!",
+} = Astro.props;
+
+// Bump ?v= when og.jpg changes: WhatsApp caches previews by image URL
+const ogImage = new URL('/og.jpg?v=2', Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- JS-detection: adds .js class; removes it after 3 s if animations never start -->
+    <script is:inline>document.documentElement.classList.add('js');setTimeout(function(){if(!document.documentElement.dataset.anim)document.documentElement.classList.remove('js')},3000)</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+
+    <!-- Open Graph / WhatsApp preview -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage.href} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Self-hosted fonts via Astro Fonts API -->
+    <Font cssVariable="--font-bangers" preload />
+    <Font cssVariable="--font-nunito" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body class="bg-night-sky text-web-white font-body antialiased overflow-x-hidden">
+    <slot />
+  </body>
+</html>
+
+<style>
+  /* Smooth scroll for anchor links */
+  html {
+    scroll-behavior: smooth;
+  }
+</style>

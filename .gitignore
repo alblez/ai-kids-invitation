@@ -1,0 +1,6 @@
+.context/
+node_modules/
+dist/
+.astro/
+.vercel/
+.DS_Store
