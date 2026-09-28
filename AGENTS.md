@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Static single-page birthday party invitation built with AI agents. Superhero theme. The demo data uses Gael turning 4; edit `src/invitation.config.ts` to set your own child's name, age, and party details. All UI text is English; code/comments are English. TypeScript throughout — Astro frontmatter and `<script>` blocks are TS by default. No backend, no data collection, no CMS. Deployed on Vercel as a static site.
+Static single-page birthday party invitation built with AI agents. Superhero theme. Every variable datum (child, party, RSVP, site, theme) lives in `src/invitation.config.ts`. TypeScript throughout — Astro frontmatter and `<script>` blocks are TS by default. No backend, no data collection, no CMS. Deployed on Vercel as a static site.
 
 ## First run (for the parent's agent)
 
@@ -10,27 +10,7 @@ When the parent starts you on this repository for the first time:
 
 1. **Run `pnpm preflight`.** Report what is missing and continue with what is possible.
 
-2. **Ask the parent for the config values, in one batch.** The config file is `src/invitation.config.ts`. Ask for each field, showing the demo value as the example:
-   - `child.name` (demo: see config file)
-   - `child.age` (demo: `4`)
-   - `child.pronouns` — subject/object/possessive (demo: `he / him / his`)
-   - `party.date` (demo: `"Saturday, June 13, 2026"`)
-   - `party.time` (demo: `"3:00 p.m. to 6:00 p.m."`)
-   - `party.ogDateTime` (demo: `"Saturday, June 13 · 3:00 p.m."`)
-   - `party.venue` (demo: `"The Beverly Hills Hotel"`)
-   - `party.address` (demo: `"9641 Sunset Boulevard, Beverly Hills, CA 90210"`)
-   - `party.addressNote` — optional, omit to hide (demo: `"Demo address — use your own party location"`)
-   - `party.links.googleMaps` — optional, auto-derived if omitted
-   - `party.links.waze` — optional, auto-derived if omitted
-   - `rsvp.whatsappNumber` — country code, no leading + (demo: `"15555550123"`)
-   - `rsvp.whatsappMessage` (demo: `"Hi! We'll be at [name]'s party. See you there!"`)
-   - `site.url` (demo: `"https://ai-kids-invitation.vercel.app"`)
-   - `site.title` (demo: `"[name] is turning [age]!"`)
-   - `site.description` (demo: `"You're invited to [name]'s birthday party."`)
-   - `theme.colors.*` — ten colour tokens; keep the defaults unless the parent wants different colours
-   - `theme.fonts.display` / `theme.fonts.body` — keep the defaults unless the parent wants different fonts
-
-   Write the answers into `src/invitation.config.ts`. Nothing else holds that data.
+2. **Ask the parent for the config values, in one batch.** Go through the fields of `src/invitation.config.ts` (its comments explain each one), showing the current value as the example. Title, description and the WhatsApp message are built from the child's name and age; keep them unless the parent wants other wording. Keep the colours and fonts unless the parent asks. Write the answers into `src/invitation.config.ts`; nothing else holds that data.
 
 3. **Check `photos/`.** If photos are there, proceed to creating the cartoon master (see `guide/2-make-it-yours.md`). If empty, tell the parent: the site will keep the demo images until they add photos, and continue — never block on it.
 
@@ -41,12 +21,7 @@ When the parent starts you on this repository for the first time:
    ```
    Show the parent the built result.
 
-5. **Privacy check before any push.** Before committing or pushing, verify:
-   - No real photos in the repo (only cartoon illustrations in `src/assets/`)
-   - No private paths (`grep -ri '/Users/' .`)
-   - No secrets or `.env` files
-   - No home address unless it is the party venue
-   - The parent's real phone number appears only in the RSVP config field
+5. **Privacy check before any push:** follow the checklist in `guide/2-make-it-yours.md` § Privacy checklist.
 
 ## Architecture & Data Flow
 
@@ -109,10 +84,10 @@ pnpm preflight        # Check tools, config, and photos
 ### Agent-mode dev server (Astro 7)
 
 ```bash
-astro dev --background   # Start detached dev server (auto-detected by AI agents)
-astro dev stop           # Stop background server
-astro dev status         # Check if running
-astro dev logs           # Tail server logs
+pnpm astro dev --background   # Start detached dev server (auto-detected by AI agents)
+pnpm astro dev stop           # Stop background server
+pnpm astro dev status         # Check if running
+pnpm astro dev logs           # Tail server logs
 ```
 
 ## Code Conventions
@@ -125,7 +100,7 @@ Astro processes all `<script>` blocks as TypeScript by default. **Do not add `la
 
 GSAP runs in `<script>` tags inside `.astro` components. **No React, no `client:` directives.**
 
-**Above-fold (Hero):** Plain GSAP timeline on page load. No ScrollTrigger. The character entrance loads `MotionPathPlugin` with a caught dynamic `import()` inside `gsap.matchMedia()` (reduced motion never downloads it). When the entrance ends, an `Again!` button (`hidden` until then, never shown under reduced motion) appears beside the character; it or a tap on the character kills the running entrance and rebuilds it from its first frame (latest tap wins; text and swing replay, no layout change). Once the entrance ends, the section gets `.hero-idle`: CSS-only loops (the character breathes and sways, the name pops, the four `.hero-star` stars (one per year) hop, `.hero-sparkle` stars twinkle, the arrow nudges) inside `prefers-reduced-motion: no-preference`; a replay or a switch to reduced motion removes the class.
+**Above-fold (Hero):** Plain GSAP timeline on page load. No ScrollTrigger. The character entrance loads `MotionPathPlugin` with a caught dynamic `import()` inside `gsap.matchMedia()` (reduced motion never downloads it). When the entrance ends, an `Again!` button (`hidden` until then, never shown under reduced motion) appears beside the character; it or a tap on the character kills the running entrance and rebuilds it from its first frame (latest tap wins; text and swing replay, no layout change). Once the entrance ends, the section gets `.hero-idle`: CSS-only loops (the character breathes and sways, the name pops, one `.hero-star` per year of `child.age` hops, `.hero-sparkle` stars twinkle, the arrow nudges) inside `prefers-reduced-motion: no-preference`; a replay or a switch to reduced motion removes the class.
 
 **Below-fold (Details, Activities, Rsvp):** GSAP ScrollTrigger for scroll-based reveals. Details plays one `once` timeline when its scene is in view, after both images decode (the character drops onto the ledge, bubble pops, native dash-offset route draws from the fingertip, star marker lands on the HQ door; no pin/snap/replay). Activities also pins a `300svh` sticky experiment track scrubbed by native scroll (no wheel/touch interception or snap). RSVP has no sticky track; each tap builds one bounded timeline (anticipation lean, R01→R02 contact, then one of eight scenes from a fixed 25-node pool with onomatopoeia burst + speech-bubble caption, looping from #2).
 
@@ -176,20 +151,20 @@ Convention: `{section}-{element}` in kebab-case.
 
 Tailwind CSS 4 with CSS-native configuration. **No `tailwind.config.js`** — all theming via `@theme {}` in `src/styles/global.css`.
 
-Theme colors (configurable in `src/invitation.config.ts` under `theme.colors`):
+Theme colours: the values live in `src/invitation.config.ts` (`theme.colors`); a Vite plugin in `astro.config.mjs` injects them into `@theme`. Token roles:
 
-|Token|Hex|Role|
-|---|---|---|
-|`hero-red`|`#e23636`|Hero accent, hero name|
-|`hero-blue`|`#2c3e8c`|Hero secondary, Hero "is turning N!" outline|
-|`hero-dark`|`#1a1a2e`|Card backgrounds (with `/50` or `/30` opacity)|
-|`power-blue`|`#3b82f6`|Power colour blue, buttons|
-|`power-green`|`#22c55e`|Power colour green, buttons|
-|`power-red`|`#ef4444`|Power colour red, RSVP section|
-|`night-sky`|`#0f172a`|Page background|
-|`city-gray`|`#334155`|Shared (defined, unused in components)|
-|`star-yellow`|`#fbbf24`|Section titles, hero subtitle|
-|`web-white`|`#f8fafc`|Body text|
+|Token|Role|
+|---|---|
+|`hero-red`|Hero accent, hero name|
+|`hero-blue`|Hero secondary, Hero "is turning N!" outline|
+|`hero-dark`|Card backgrounds (with `/50` or `/30` opacity)|
+|`power-blue`|Power colour blue, buttons|
+|`power-green`|Power colour green, buttons|
+|`power-red`|Power colour red, RSVP section|
+|`night-sky`|Page background|
+|`city-gray`|Shared (defined, unused in components)|
+|`star-yellow`|Section titles, hero subtitle|
+|`web-white`|Body text|
 
 Fonts: configurable in `src/invitation.config.ts` (`theme.fonts`). Self-hosted via Astro's built-in Fonts API — `fonts` array in `astro.config.mjs` reads the config and passes names/weights to `fontProviders.google()`, `<Font>` component from `astro:assets` in Layout, CSS variables `--font-inv-display` / `--font-inv-body` referenced in `@theme`. No Google Fonts `<link>` at runtime.
 
@@ -232,6 +207,4 @@ Runtime dependencies: `astro`, `gsap`, `tailwindcss`. Dev dependencies: `typescr
 
 1. `pnpm build` — must succeed with zero warnings
 2. `pnpm preview` — visual check on mobile (375px) and desktop viewports
-3. WhatsApp deep link: verify pre-filled message opens on a real phone
-4. Google Maps + Waze links: verify correct address opens
-5. OG preview: share link in WhatsApp, confirm image/title/description render
+3. After deploying, the parent tests on a real phone: `guide/2-make-it-yours.md` § Test on a real phone
