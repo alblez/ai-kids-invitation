@@ -12,8 +12,8 @@ Open `src/components/Details.astro` and update the `partyDetails` object near th
 const partyDetails: PartyDetails = {
   date: 'Saturday, June 13, 2026',           // your party date
   time: '3:00 p.m. to 6:00 p.m.',            // your party time
-  venue: 'Chelsea Piers Field House',         // your venue name
-  address: '62 Chelsea Piers, New York, NY 10011',  // your address
+  venue: 'The Beverly Hills Hotel',         // your venue name
+  address: '9641 Sunset Boulevard, Beverly Hills, CA 90210',  // your address
   addressNote: 'Demo address — use your own party location',
   addressEncoded: encodeURIComponent('Your Venue, Your Address'),
 };

@@ -150,7 +150,7 @@ const svg = await satori(
       },
     },
       h('span', {}, 'Saturday, June 13 \u00b7 3:00 p.m.'),
-      h('span', {}, 'Chelsea Piers Field House'),
+      h('span', {}, 'The Beverly Hills Hotel'),
     ),
   ),
   {
