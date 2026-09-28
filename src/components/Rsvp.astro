@@ -1,17 +1,13 @@
 ---
 /**
- * RSVP section — Gael's optional high-five, then the WhatsApp pre-filled message.
+ * RSVP section — the character's optional high-five, then the WhatsApp pre-filled message.
  * Below fold: ScrollTrigger reveal.
  */
+import { invitation, whatsappUrl } from '../invitation.config';
 import reaching from '../assets/rsvp/rsvp-r01w-reaching.webp';
 import highFive from '../assets/rsvp/rsvp-r02w-high-five.webp';
 
-// Fictional placeholder: replace with your WhatsApp number (country code, no +)
-const whatsappNumber: string = '15555550123';
-const whatsappMessage: string = encodeURIComponent(
-  "Hi! We'll be at Gael's party. See you there!"
-);
-const whatsappUrl: string = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+const { name, pronouns } = invitation.child;
 ---
 
 <section
@@ -23,7 +19,7 @@ const whatsappUrl: string = `https://wa.me/${whatsappNumber}?text=${whatsappMess
   </p>
 
   <h2 class="rsvp-title font-display text-4xl md:text-5xl text-power-red mb-4">
-    Gael says, come play!
+    {name} says, come play!
   </h2>
 
   <!-- R01 is plain HTML; R02, the effects and the button need the script and both decoded images -->
@@ -36,7 +32,7 @@ const whatsappUrl: string = `https://wa.me/${whatsappNumber}?text=${whatsappMess
         height={reaching.height}
         loading="lazy"
         decoding="async"
-        alt="Gael in a red and blue superhero suit, mask off, raising his open hand for a high five"
+        alt={`${name} in a red and blue superhero suit, mask off, raising ${pronouns.possessive} open hand for a high five`}
       />
       <img
         class="rsvp-pose absolute inset-0 size-full"
@@ -68,7 +64,7 @@ const whatsappUrl: string = `https://wa.me/${whatsappNumber}?text=${whatsappMess
     <p class="rsvp-caption font-display text-base md:text-xl" aria-live="polite"></p>
   </div>
 
-  <!-- Reserved slot right under Gael's hand: showing the button never moves the WhatsApp link -->
+  <!-- Reserved slot right under the character's hand: showing the button never moves the WhatsApp link -->
   <div class="min-h-14">
     <button
       type="button"
@@ -95,12 +91,12 @@ const whatsappUrl: string = `https://wa.me/${whatsappNumber}?text=${whatsappMess
   </a>
 
   <p class="mt-12 text-white/30 text-sm font-display">
-    Made with ❤️ for Gael
+    Made with ❤️ for {name}
   </p>
 </section>
 
 <style>
-  /* Frame and figure squash/lean around Gael's feet */
+  /* Frame and figure squash/lean around the character's feet */
   .rsvp-frame,
   .rsvp-figure {
     transform-origin: 50% 96%;
@@ -215,7 +211,9 @@ const whatsappUrl: string = `https://wa.me/${whatsappNumber}?text=${whatsappMess
 <script>
   import { gsap } from 'gsap';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { invitation } from '../invitation.config';
   gsap.registerPlugin(ScrollTrigger);
+  const _c = invitation.theme.colors;
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -262,7 +260,7 @@ const whatsappUrl: string = `https://wa.me/${whatsappNumber}?text=${whatsappMess
       'Oops, sticky hand!', 'Even baddies felt it!', 'New high-five record!',
       'Coming? RSVP on WhatsApp.',
     ];
-    const [YELLOW, RED, BLUE, GREEN, WHITE] = ['#fbbf24', '#ef4444', '#3b82f6', '#22c55e', '#f8fafc'];
+    const [YELLOW, RED, BLUE, GREEN, WHITE] = [_c.starYellow, _c.powerRed, _c.powerBlue, _c.powerGreen, _c.webWhite];
     const HIT = 0.22; // contact: R01 -> R02 after the anticipation lean
     let tl = gsap.timeline();
     let taps = 0;

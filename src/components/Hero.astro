@@ -4,6 +4,7 @@
  * Uses a plain GSAP timeline on load (no ScrollTrigger — fires immediately).
  * Initial state set via CSS .gsap-hidden to prevent FOUC on slow connections.
  */
+import { invitation } from '../invitation.config';
 import swing600 from '../assets/hero/hero-swing-600.webp';
 import swing900 from '../assets/hero/hero-swing-900.webp';
 import swing1200 from '../assets/hero/hero-swing-1200.webp';
@@ -14,10 +15,17 @@ import web from '../assets/hero/hero-web.webp';
 import sky900 from '../assets/hero/hero-sky-900.webp';
 import sky1536 from '../assets/hero/hero-sky-1536.webp';
 
+const { name, age, pronouns } = invitation.child;
+const c = invitation.theme.colors;
+
 // Rendered canvas width is 2 × the frame width (see the <style> block).
 const sizes = '(min-width: 1215px) 680px, (min-width: 768px) 56vw, 112vw';
 const swingSrcset = `${swing600.src} 600w, ${swing900.src} 900w, ${swing1200.src} 1200w`;
 const revealedSrcset = `${revealed600.src} 600w, ${revealed900.src} 900w, ${revealed1200.src} 1200w`;
+
+// One star per year, cycling four power colours (ponytail: clamped 1–10; wider range would need layout work)
+const starCount = Math.min(10, Math.max(1, age));
+const starColors = ['bg-power-blue', 'bg-power-green', 'bg-power-red', 'bg-star-yellow'];
 ---
 
 <section
@@ -27,10 +35,10 @@ const revealedSrcset = `${revealed600.src} 600w, ${revealed900.src} 900w, ${reve
   <!-- Comic night sky (decorative): 3D rooftop plate, stars, corner web, searchlights; the moon is .hero-stage::before -->
   <div class="hero-sky absolute inset-0 -z-10" aria-hidden="true">
     <img class="hero-plate" src={sky1536.src} srcset={`${sky900.src} 900w, ${sky1536.src} 1536w`} sizes="(max-aspect-ratio: 4/3) 177svh, 100vw" width="1536" height="1152" fetchpriority="low" decoding="async" alt="" />
-    <svg class="absolute inset-0 size-full" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" fill="#f8fafc" opacity="0.7">
+    <svg class="absolute inset-0 size-full" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" fill={c.webWhite} opacity="0.7">
       <circle cx="374" cy="456" r="2.5" /><circle cx="659" cy="581" r="2" /><circle cx="936" cy="341" r="1.5" /><circle cx="869" cy="73" r="2" /><circle cx="294" cy="606" r="2" /><circle cx="135" cy="349" r="2" /><circle cx="307" cy="480" r="1.5" /><circle cx="53" cy="375" r="1.5" /><circle cx="927" cy="302" r="2.5" /><circle cx="28" cy="340" r="2.5" /><circle cx="339" cy="166" r="3.5" /><circle cx="892" cy="89" r="2.5" /><circle cx="642" cy="206" r="3.5" /><circle cx="309" cy="149" r="2.5" /><circle cx="400" cy="623" r="2" /><circle cx="349" cy="596" r="1.5" /><circle cx="382" cy="55" r="3.5" /><circle cx="183" cy="383" r="2.5" /><circle cx="307" cy="595" r="1.5" /><circle cx="459" cy="222" r="3.5" /><circle cx="948" cy="222" r="1.5" /><circle cx="70" cy="73" r="1.5" /><circle cx="764" cy="182" r="2" /><circle cx="631" cy="51" r="3.5" /><circle cx="606" cy="265" r="2.5" /><circle cx="46" cy="135" r="2.5" />
     </svg>
-    <svg class="hero-web-corner" viewBox="0 0 200 200" fill="none" stroke="#f8fafc" stroke-width="1.5">
+    <svg class="hero-web-corner" viewBox="0 0 200 200" fill="none" stroke={c.webWhite} stroke-width="1.5">
       <path d="M0 0L279 20M0 0L263 96M0 0L214 180M0 0L140 242M0 0L49 276M45 3Q38 8 42 15Q34 19 34 29Q25 30 23 39Q13 36 8 44M90 6Q76 16 85 31Q67 39 69 58Q50 59 45 78Q26 73 16 89M140 10Q118 25 132 48Q104 60 107 90Q77 92 70 121Q41 113 24 138M195 14Q164 35 183 67Q145 84 149 125Q108 128 98 169Q57 158 34 192" />
     </svg>
     <div class="hero-beam hero-beam-warm"></div>
@@ -43,19 +51,21 @@ const revealedSrcset = `${revealed600.src} 600w, ${revealed900.src} 900w, ${reve
     </p>
 
     <h1 class="hero-name gsap-hidden font-display text-[5.25rem] md:text-9xl lg:text-[10rem] text-hero-red leading-none mb-1">
-      Gael
+      {name}
     </h1>
 
     <p class="hero-age gsap-hidden font-display text-5xl md:text-7xl text-web-white">
-      is turning <span class="hero-four">4</span>!
+      is turning <span class="hero-four">{age}</span>!
     </p>
 
-    <div class="hero-mask gsap-hidden mt-4 md:mt-6 flex gap-3">
-      <!-- Four comic stars, one per year: power colours plus the yellow of the big 4 -->
-      <span class="hero-star bg-power-blue" aria-hidden="true"></span>
-      <span class="hero-star bg-power-green" aria-hidden="true"></span>
-      <span class="hero-star bg-power-red" aria-hidden="true"></span>
-      <span class="hero-star bg-star-yellow" aria-hidden="true"></span>
+    <div class={`hero-mask gsap-hidden mt-4 md:mt-6 flex justify-center ${starCount > 7 ? 'gap-1.5' : 'gap-3'}`}>
+      {Array.from({ length: starCount }, (_, i) => (
+        <span
+          class={`hero-star ${starColors[i % 4]} ${starCount > 7 ? 'hero-star-sm' : ''}`}
+          aria-hidden="true"
+          style={i > 0 ? `animation-delay: ${i * 0.15}s` : undefined}
+        />
+      ))}
     </div>
   </div>
 
@@ -73,14 +83,14 @@ const revealedSrcset = `${revealed600.src} 600w, ${revealed900.src} 900w, ${reve
       {sizes}
       width="1200"
       height="1200"
-      alt="Gael in a red and blue superhero suit, mask off and smiling, holding his mask"
+      alt={`${name} in a red and blue superhero suit, mask off and smiling, holding ${pronouns.possessive} mask`}
     />
-    <!-- Idle sparkles around Gael's head: invisible unless the idle loop runs -->
+    <!-- Idle sparkles around the character's head: invisible unless the idle loop runs -->
     <span class="hero-sparkle" aria-hidden="true"></span>
     <span class="hero-sparkle" aria-hidden="true"></span>
     <span class="hero-sparkle" aria-hidden="true"></span>
     <span class="hero-sparkle" aria-hidden="true"></span>
-    <!-- Replay: shown when the entrance ends (never under reduced motion); tapping Gael does the same -->
+    <!-- Replay: shown when the entrance ends (never under reduced motion); tapping the character does the same -->
     <button
       type="button"
       class="hero-replay font-display text-star-yellow focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
@@ -104,10 +114,10 @@ const revealedSrcset = `${revealed600.src} 600w, ${revealed900.src} 900w, ${reve
 </section>
 
 <style>
-  /* Night sky: the gradient is the fallback under the 3D plate; ::after adds a blue glow around Gael
+  /* Night sky: the gradient is the fallback under the 3D plate; ::after adds a blue glow around the character
      and fades the rooftops into the page colour so Details starts without a seam. */
   .hero-sky {
-    background: linear-gradient(#070b1f, #0f172a 55%, #1a1a3e);
+    background: linear-gradient(#070b1f, var(--color-night-sky) 55%, #1a1a3e);
   }
   .hero-sky::after {
     content: '';
@@ -115,7 +125,7 @@ const revealedSrcset = `${revealed600.src} 600w, ${revealed900.src} 900w, ${reve
     inset: 0;
     background:
       radial-gradient(ellipse 60% 45% at 50% 55%, rgb(59 130 246 / 0.18), transparent 70%),
-      linear-gradient(transparent 82%, #0f172a);
+      linear-gradient(transparent 82%, var(--color-night-sky));
   }
   .hero-plate {
     position: absolute;
@@ -164,7 +174,7 @@ const revealedSrcset = `${revealed600.src} 600w, ${revealed900.src} 900w, ${reve
     from { transform: rotate(-22deg); }
     to { transform: rotate(18deg); }
   }
-  /* Halftone comic moon behind Gael's head (frame units: head centre ~ 0.53w, 0.31w) */
+  /* Halftone comic moon behind the character's head (frame units: head centre ~ 0.53w, 0.31w) */
   .hero-stage::before {
     content: '';
     position: absolute;
@@ -176,7 +186,7 @@ const revealedSrcset = `${revealed600.src} 600w, ${revealed900.src} 900w, ${reve
     border-radius: 50%;
     background:
       radial-gradient(circle, rgb(217 119 6 / 0.35) 1.4px, transparent 1.9px) 0 0 / 7px 7px,
-      radial-gradient(circle at 38% 34%, #fefce8, #fde68a 55%, #fbbf24);
+      radial-gradient(circle at 38% 34%, #fefce8, #fde68a 55%, var(--color-star-yellow));
     box-shadow: 0 0 40px 12px rgb(253 230 138 / 0.25);
   }
   /* Idle life after the entrance (.hero-idle is added by the script only; never under reduced motion).
@@ -195,7 +205,7 @@ const revealedSrcset = `${revealed600.src} 600w, ${revealed900.src} 900w, ${reve
   .hero-sparkle:nth-of-type(3) { left: 12%; top: 33%; width: 12px; height: 12px; }
   .hero-sparkle:nth-of-type(4) { left: 86%; top: 30%; }
   @media (prefers-reduced-motion: no-preference) {
-    /* Breathing + a slow sway, pivoting between his feet (canvas y 1137 of 1200) */
+    /* Breathing + a slow sway, pivoting between the character's feet (canvas y 1137 of 1200) */
     .hero-idle .hero-portrait {
       transform-origin: 50% 94.75%;
       animation: hero-breathe 3.2s ease-in-out infinite;
@@ -206,9 +216,6 @@ const revealedSrcset = `${revealed600.src} 600w, ${revealed900.src} 900w, ${reve
     .hero-idle .hero-mask span {
       animation: hero-hop 4s ease-in-out infinite;
     }
-    .hero-idle .hero-mask span:nth-child(2) { animation-delay: 0.15s; }
-    .hero-idle .hero-mask span:nth-child(3) { animation-delay: 0.3s; }
-    .hero-idle .hero-mask span:nth-child(4) { animation-delay: 0.45s; }
     .hero-idle .hero-sparkle {
       animation: hero-twinkle 2.4s ease-in-out infinite;
     }
@@ -298,6 +305,10 @@ const revealedSrcset = `${revealed600.src} 600w, ${revealed900.src} 900w, ${reve
     height: 34px;
     clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
   }
+  .hero-star-sm {
+    width: 24px;
+    height: 24px;
+  }
   .hero-stage {
     --w: min(56vw, 30svh, 300px);
     width: var(--w);
@@ -330,7 +341,7 @@ const revealedSrcset = `${revealed600.src} 600w, ${revealed900.src} 900w, ${reve
     width: 33.333%;
     height: auto;
   }
-  /* Right of the frame, in the side margin (>= 87 px at 375 px) so it never covers Gael or the text. */
+  /* Right of the frame, in the side margin (>= 87 px at 375 px) so it never covers the character or the text. */
   .hero-replay {
     position: absolute;
     left: calc(100% + 4px);
@@ -408,7 +419,7 @@ const revealedSrcset = `${revealed600.src} 600w, ${revealed900.src} 900w, ${reve
       done = true;
     };
 
-    // The button (and the click on Gael's frame, which it bubbles to) restarts the entrance; latest tap wins.
+    // The button (and the click on the character's frame, which it bubbles to) restarts the entrance; latest tap wins.
     stage.addEventListener('click', () => {
       if (done) replay?.();
     });

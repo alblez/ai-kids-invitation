@@ -1,7 +1,7 @@
 /**
  * Generate static OG image (1200x630) for WhatsApp preview.
  * Uses Satori (JSX -> SVG) + resvg (SVG -> PNG) + sips (PNG -> JPEG).
- * Run: node scripts/generate-og.mjs
+ * Run: pnpm og
  * // ponytail: macOS-only (sips); swap for sharp if run elsewhere
  */
 import satori from 'satori';
@@ -11,9 +11,16 @@ import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { invitation } from '../src/invitation.config.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
+
+const { name, age } = invitation.child;
+const { venue } = invitation.party;
+const ogDateTime = invitation.party.ogDateTime;
+const col = invitation.theme.colors;
+const fonts = invitation.theme.fonts;
 
 // Fetch Google Fonts
 async function fetchFont(family, weight) {
@@ -24,9 +31,9 @@ async function fetchFont(family, weight) {
   return fetch(fontUrl).then(r => r.arrayBuffer());
 }
 
-const [bangersData, nunitoData] = await Promise.all([
-  fetchFont('Bangers', 400),
-  fetchFont('Nunito', 700),
+const [displayData, bodyData] = await Promise.all([
+  fetchFont(fonts.display.name, fonts.display.weights[0]),
+  fetchFont(fonts.body.name, 700),
 ]);
 
 const width = 1200;
@@ -50,8 +57,8 @@ const svg = await satori(
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'linear-gradient(135deg, #0f172a 0%, #1a1a2e 50%, #0f172a 100%)',
-      fontFamily: 'Nunito',
+      background: `linear-gradient(135deg, ${col.nightSky} 0%, ${col.heroDark} 50%, ${col.nightSky} 100%)`,
+      fontFamily: fonts.body.name,
       position: 'relative',
       overflow: 'hidden',
     },
@@ -64,7 +71,7 @@ const svg = await satori(
         left: 0,
         right: 0,
         height: '6px',
-        background: 'linear-gradient(90deg, #3b82f6, #e23636, #22c55e, #ef4444, #fbbf24)',
+        background: `linear-gradient(90deg, ${col.powerBlue}, ${col.heroRed}, ${col.powerGreen}, ${col.powerRed}, ${col.starYellow})`,
       },
     }),
     // Bottom gradient bar
@@ -75,7 +82,7 @@ const svg = await satori(
         left: 0,
         right: 0,
         height: '6px',
-        background: 'linear-gradient(90deg, #fbbf24, #ef4444, #22c55e, #e23636, #3b82f6)',
+        background: `linear-gradient(90deg, ${col.starYellow}, ${col.powerRed}, ${col.powerGreen}, ${col.heroRed}, ${col.powerBlue})`,
       },
     }),
     // Decorative circles (web pattern)
@@ -96,35 +103,35 @@ const svg = await satori(
     h('div', {
       style: {
         fontSize: '28px',
-        color: '#fbbf24',
+        color: col.starYellow,
         letterSpacing: '6px',
         textTransform: 'uppercase',
         marginBottom: '4px',
-        fontFamily: 'Nunito',
+        fontFamily: fonts.body.name,
       },
     }, "You're invited!"),
     // Name
     h('div', {
       style: {
         fontSize: '140px',
-        color: '#e23636',
-        fontFamily: 'Bangers',
+        color: col.heroRed,
+        fontFamily: fonts.display.name,
         lineHeight: 1,
-        textShadow: '4px 4px 0 #1a1a2e',
+        textShadow: `4px 4px 0 ${col.heroDark}`,
         marginBottom: '0px',
       },
-    }, 'Gael'),
+    }, name),
     // Age
     h('div', {
       style: {
         fontSize: '90px',
-        color: '#3b82f6',
-        fontFamily: 'Bangers',
+        color: col.powerBlue,
+        fontFamily: fonts.display.name,
         lineHeight: 1,
-        textShadow: '3px 3px 0 #1a1a2e',
+        textShadow: `3px 3px 0 ${col.heroDark}`,
         marginBottom: '16px',
       },
-    }, 'is turning 4!'),
+    }, `is turning ${age}!`),
     // Colour dots
     h('div', {
       style: {
@@ -133,9 +140,9 @@ const svg = await satori(
         marginBottom: '16px',
       },
     },
-      h('div', { style: { width: '28px', height: '28px', borderRadius: '50%', background: '#3b82f6' } }),
-      h('div', { style: { width: '28px', height: '28px', borderRadius: '50%', background: '#22c55e' } }),
-      h('div', { style: { width: '28px', height: '28px', borderRadius: '50%', background: '#ef4444' } }),
+      h('div', { style: { width: '28px', height: '28px', borderRadius: '50%', background: col.powerBlue } }),
+      h('div', { style: { width: '28px', height: '28px', borderRadius: '50%', background: col.powerGreen } }),
+      h('div', { style: { width: '28px', height: '28px', borderRadius: '50%', background: col.powerRed } }),
     ),
     // Details
     h('div', {
@@ -149,16 +156,16 @@ const svg = await satori(
         alignItems: 'center',
       },
     },
-      h('span', {}, 'Saturday, June 13 \u00b7 3:00 p.m.'),
-      h('span', {}, 'The Beverly Hills Hotel'),
+      h('span', {}, ogDateTime),
+      h('span', {}, venue),
     ),
   ),
   {
     width,
     height,
     fonts: [
-      { name: 'Bangers', data: bangersData, weight: 400, style: 'normal' },
-      { name: 'Nunito', data: nunitoData, weight: 700, style: 'normal' },
+      { name: fonts.display.name, data: displayData, weight: fonts.display.weights[0], style: 'normal' },
+      { name: fonts.body.name, data: bodyData, weight: 700, style: 'normal' },
     ],
   }
 );

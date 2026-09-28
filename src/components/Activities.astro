@@ -4,20 +4,23 @@
  * Managed by an agency. Below fold: staggered ScrollTrigger reveals.
  * Superpower experiment: sticky scrubbed track with colour buttons.
  */
+import { invitation } from '../invitation.config';
 import scientist from '../assets/activities/act-r01w-scientist.webp';
 import cat from '../assets/activities/act-r02w-cat.webp';
 import lizard from '../assets/activities/act-r03w-lizard.webp';
 import owl from '../assets/activities/act-r04w-owl.webp';
+
+const { name, pronouns } = invitation.child;
 
 // Each costume reveals one party activity; balloon twisting is the prize.
 const prize = { emoji: '🎈', headline: 'A little something to take home!', line: 'Take home a balloon animal, too!' };
 
 // Pose order is the phase index: 0 scientist, 1 blue, 2 green, 3 red.
 const poses = [
-  { img: scientist, costume: 'none', alt: 'Gael as a scientist, with lab goggles on his forehead and a beaker in his hands' },
-  { img: cat, costume: 'blue', alt: 'Gael in a blue cat costume' },
-  { img: lizard, costume: 'green', alt: 'Gael in a green lizard costume' },
-  { img: owl, costume: 'red', alt: 'Gael in a red costume with wings' },
+  { img: scientist, costume: 'none', alt: `${name} as a scientist, with lab goggles on ${pronouns.possessive} forehead and a beaker in ${pronouns.possessive} hands` },
+  { img: cat, costume: 'blue', alt: `${name} in a blue cat costume` },
+  { img: lizard, costume: 'green', alt: `${name} in a green lizard costume` },
+  { img: owl, costume: 'red', alt: `${name} in a red costume with wings` },
 ];
 
 const powers = [
@@ -33,7 +36,7 @@ const powers = [
 >
   <!-- Section title -->
   <h2 class="activities-title font-display text-4xl md:text-5xl text-power-green mb-4 text-center">
-    🧪 Gael's Lab
+    🧪 {name}'s Lab
   </h2>
 
   <!-- Adventure intro -->
@@ -42,7 +45,7 @@ const powers = [
       Mix colours and powers!
     </p>
     <p class="text-white/70 text-lg max-w-md mx-auto">
-      Step into Gael's lab. Pick a colour, watch him become a hero, and discover the power you'll try at the party.
+      Step into {name}'s lab. Pick a colour, watch {pronouns.object} become a hero, and discover the power you'll try at the party.
     </p>
   </div>
 
@@ -156,7 +159,9 @@ const powers = [
 <script>
   import { gsap } from 'gsap';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { invitation } from '../invitation.config';
   gsap.registerPlugin(ScrollTrigger);
+  const _c = invitation.theme.colors;
 
   let cards: ReturnType<typeof gsap.fromTo> | undefined;
   // Essential content is not .gsap-hidden: GSAP hides it only once this module runs.
@@ -265,14 +270,14 @@ const powers = [
         // Bubbles rise from the beaker
         sparks.slice(0, 8).forEach((s, i) => {
           const d = rnd(10, 20);
-          tl.fromTo(s, { ...base, width: d, height: d, borderRadius: '50%', border: '2px solid #bfdbfe', background: 'rgba(59, 130, 246, 0.35)', x: rnd(-40, 40), y: 0, scale: 0.4 },
+          tl.fromTo(s, { ...base, width: d, height: d, borderRadius: '50%', border: '2px solid #bfdbfe', background: `${_c.powerBlue}59`, x: rnd(-40, 40), y: 0, scale: 0.4 },
             { x: `+=${rnd(-30, 30)}`, y: -rnd(70, 130), scale: 1, autoAlpha: 0, duration: rnd(0.6, 0.9), ease: 'power1.out' }, i * 0.03);
         });
       } else if (k === 2) {
         // Slime blobs wobble and sink
         sparks.slice(0, 4).forEach((s, i) => {
           const d = rnd(26, 34);
-          tl.fromTo(s, { ...base, width: d, height: d, borderRadius: '45% 55% 50% 50%', background: ['#22c55e', '#4ade80', '#16a34a', '#86efac'][i], x: (i - 1.5) * 34, y: rnd(-10, 10), scaleX: 1, scaleY: 1 },
+          tl.fromTo(s, { ...base, width: d, height: d, borderRadius: '45% 55% 50% 50%', background: [_c.powerGreen, '#4ade80', '#16a34a', '#86efac'][i], x: (i - 1.5) * 34, y: rnd(-10, 10), scaleX: 1, scaleY: 1 },
             { scaleX: 1.6, scaleY: 0.7, duration: 0.25, ease: 'sine.out' }, i * 0.05)
             .to(s, { scaleX: 0.8, scaleY: 1.1, y: '+=20', autoAlpha: 0, duration: rnd(0.4, 0.55), ease: 'sine.in' }, '>');
         });
@@ -282,7 +287,7 @@ const powers = [
           const a = (i / 12) * Math.PI * 2 + rnd(-0.2, 0.2);
           const dist = rnd(70, 120);
           const d = rnd(8, 12);
-          tl.fromTo(s, { ...base, width: d, height: d, borderRadius: i % 2 ? '50%' : '2px', background: ['#ef4444', '#fbbf24', '#f87171'][i % 3], x: 0, y: 0, rotation: 0 },
+          tl.fromTo(s, { ...base, width: d, height: d, borderRadius: i % 2 ? '50%' : '2px', background: [_c.powerRed, _c.starYellow, '#f87171'][i % 3], x: 0, y: 0, rotation: 0 },
             { x: Math.cos(a) * dist, y: Math.sin(a) * dist, rotation: rnd(-270, 270), autoAlpha: 0, duration: rnd(0.6, 0.9), ease: 'power2.out' }, 0);
         });
       }

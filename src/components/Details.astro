@@ -1,30 +1,16 @@
 ---
 /**
  * Details section — party date, time, location.
- * Gael points from a rooftop to his headquarters (decorative scene), above the facts card.
+ * The character points from a rooftop to the headquarters (decorative scene), above the facts card.
  * Below fold: ScrollTrigger reveals + a one-shot route/marker. Links open address in Google Maps or Waze.
  */
+import { invitation, googleMapsUrl, wazeUrl } from '../invitation.config';
 import city from '../assets/details/det-city-01.webp';
-import gael from '../assets/details/det-gael-01.webp';
+import characterImg from '../assets/details/det-gael-01.webp';
 
-interface PartyDetails {
-  date: string;
-  time: string;
-  venue: string;
-  address: string;
-  addressNote: string;
-  addressEncoded: string;
-}
-
-// Example details: replace with your party's date, time and place.
-const partyDetails: PartyDetails = {
-  date: 'Saturday, June 13, 2026',
-  time: '3:00 p.m. to 6:00 p.m.',
-  venue: 'The Beverly Hills Hotel',
-  address: '9641 Sunset Boulevard, Beverly Hills, CA 90210',
-  addressNote: 'Demo address — use your own party location',
-  addressEncoded: encodeURIComponent('The Beverly Hills Hotel, 9641 Sunset Boulevard, Beverly Hills, CA 90210'),
-};
+const { age } = invitation.child;
+const { date, time, venue, address, addressNote } = invitation.party;
+const c = invitation.theme.colors;
 ---
 
 <section
@@ -38,31 +24,31 @@ const partyDetails: PartyDetails = {
   <!-- Decorative scene in the city plate's 1184x896 frame: finished state by default, removed if an image fails -->
   <div class="details-scene relative -mx-4 md:mx-0 mb-8 overflow-hidden md:rounded-2xl bg-night-sky">
     <img class="absolute inset-0 size-full" src={city.src} width={city.width} height={city.height} loading="lazy" decoding="async" alt="" />
-    <img class="details-gael absolute" src={gael.src} width={gael.width} height={gael.height} loading="lazy" decoding="async" alt="" />
+    <img class="details-character absolute" src={characterImg.src} width={characterImg.width} height={characterImg.height} loading="lazy" decoding="async" alt="" />
     <svg class="absolute inset-0 size-full" viewBox="0 0 1184 896" aria-hidden="true">
       <!-- Fingertip (588, 477) -> hop over the roof gap -> HQ arched door (768, 594) -->
       <path
         class="details-route"
         pathLength="1"
         fill="none"
-        stroke="#fbbf24"
+        stroke={c.starYellow}
         stroke-width="11"
         stroke-linecap="round"
         d="M592 482C618 512 636 536 662 526 690 515 684 400 718 400 752 400 764 480 768 540"
       />
-      <circle class="details-tip" cx="592" cy="482" r="10" fill="#f8fafc" stroke="#0f172a" stroke-width="4" />
+      <circle class="details-tip" cx="592" cy="482" r="10" fill={c.webWhite} stroke={c.nightSky} stroke-width="4" />
       <!-- Star marker and its one-shot ring, centred on the HQ door (768, 594) -->
       <g transform="translate(768 594) scale(1.15)">
-        <circle class="details-ring" r="50" fill="none" stroke="#fbbf24" stroke-width="7" />
+        <circle class="details-ring" r="50" fill="none" stroke={c.starYellow} stroke-width="7" />
         <g class="details-marker">
           <path
             d="M0-50 15.3-21 47.6-15.5 24.7 8 29.4 40.5 0 26-29.4 40.5-24.7 8-47.6-15.5-15.3-21Z"
-            fill="#fbbf24"
-            stroke="#0f172a"
+            fill={c.starYellow}
+            stroke={c.nightSky}
             stroke-width="7"
             stroke-linejoin="round"
           />
-          <text class="font-display" y="15" text-anchor="middle" font-size="40" fill="#0f172a">4</text>
+          <text class="font-display" y="15" text-anchor="middle" font-size="40" fill={c.nightSky}>{age}</text>
         </g>
       </g>
     </svg>
@@ -73,26 +59,26 @@ const partyDetails: PartyDetails = {
     <div class="space-y-6">
       <div>
         <p class="text-sm uppercase tracking-widest text-power-blue font-semibold mb-1">Date</p>
-        <p class="text-xl font-bold">{partyDetails.date}</p>
+        <p class="text-xl font-bold">{date}</p>
       </div>
 
       <div>
         <p class="text-sm uppercase tracking-widest text-power-green font-semibold mb-1">Time</p>
-        <p class="text-xl font-bold">{partyDetails.time}</p>
+        <p class="text-xl font-bold">{time}</p>
       </div>
 
       <div>
         <p class="text-sm uppercase tracking-widest text-power-red font-semibold mb-1">Place</p>
-        <p class="text-xl font-bold">{partyDetails.venue}</p>
-        <p class="text-white/60 text-sm mt-1">{partyDetails.address}</p>
-        <p class="text-white/40 text-sm">{partyDetails.addressNote}</p>
+        <p class="text-xl font-bold">{venue}</p>
+        <p class="text-white/60 text-sm mt-1">{address}</p>
+        {addressNote && <p class="text-white/40 text-sm">{addressNote}</p>}
       </div>
     </div>
 
     <!-- Map links -->
     <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
       <a
-        href={`https://www.google.com/maps/search/?api=1&query=${partyDetails.addressEncoded}`}
+        href={googleMapsUrl}
         target="_blank"
         rel="noopener noreferrer"
         class="inline-flex items-center justify-center gap-2 bg-power-blue hover:bg-power-blue/80 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
@@ -103,7 +89,7 @@ const partyDetails: PartyDetails = {
         Google Maps
       </a>
       <a
-        href={`https://waze.com/ul?q=${partyDetails.addressEncoded}&navigate=yes`}
+        href={wazeUrl}
         target="_blank"
         rel="noopener noreferrer"
         class="inline-flex items-center justify-center gap-2 bg-power-green hover:bg-power-green/80 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
@@ -123,12 +109,12 @@ const partyDetails: PartyDetails = {
     aspect-ratio: 1184 / 896;
     container-type: inline-size;
   }
-  /* Gael master x0.62 -> box (126.3, 27.8) 496x620 in plate px: feet on the left ledge (y ~ 628), fingertip at (588, 477) */
-  .details-gael {
+  /* Character master x0.62 -> box (126.3, 27.8) 496x620 in plate px: feet on the left ledge (y ~ 628), fingertip at (588, 477) */
+  .details-character {
     left: 10.667%;
     top: 3.103%;
     width: 41.892%;
-    transform-origin: 52% 96.8%; /* between his feet */
+    transform-origin: 52% 96.8%; /* between the character's feet */
   }
   .details-route {
     stroke-dasharray: 1;
@@ -140,7 +126,7 @@ const partyDetails: PartyDetails = {
   .details-ring {
     visibility: hidden;
   }
-  /* Speech bubble in the sky right of his hair (never on the face); the tail points to his mouth */
+  /* Speech bubble in the sky right of the character's hair (never on the face); the tail points to the mouth */
   .details-bubble {
     position: absolute;
     left: 43%;
@@ -241,7 +227,7 @@ const partyDetails: PartyDetails = {
     tl = gsap.timeline({ paused: true }); // assigned before any tween, so a throw below can still revert what was prepared
     try {
       tl
-        // 1. Gael drops onto the ledge and squashes on landing
+        // 1. The character drops onto the ledge and squashes on landing
         .fromTo(character, { autoAlpha: 0, yPercent: -14 }, { autoAlpha: 1, yPercent: 0, duration: 0.4, ease: 'power2.in' })
         .to(character, { scaleX: 1.05, scaleY: 0.93, duration: 0.09, yoyo: true, repeat: 1, ease: 'power1.out' })
         .fromTo(bubble, { autoAlpha: 0, scale: 0, rotation: -8 }, {

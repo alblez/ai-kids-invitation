@@ -1,5 +1,6 @@
 ---
 import { Font } from 'astro:assets';
+import { invitation } from '../invitation.config';
 
 interface Props {
   title?: string;
@@ -7,8 +8,8 @@ interface Props {
 }
 
 const {
-  title = 'Gael is turning 4! 🎉',
-  description = "You're invited to Gael's birthday party. Come celebrate with us!",
+  title = invitation.site.title,
+  description = invitation.site.description,
 } = Astro.props;
 
 // Bump ?v= when og.jpg changes: WhatsApp caches previews by image URL
@@ -34,8 +35,8 @@ const ogImage = new URL('/og.jpg?v=2', Astro.site);
     <meta property="og:image:height" content="630" />
 
     <!-- Self-hosted fonts via Astro Fonts API -->
-    <Font cssVariable="--font-bangers" preload />
-    <Font cssVariable="--font-nunito" />
+    <Font cssVariable="--font-inv-display" preload />
+    <Font cssVariable="--font-inv-body" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
