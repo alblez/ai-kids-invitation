@@ -32,38 +32,19 @@ Match the model to the risk level of the work. These are criteria, not brand rec
 | Orchestration (design, handoffs, monitoring) | An advanced model, medium effort | Judgment across the whole project; high effort was slower without visible gain for this role |
 | Complex animation code, final verification | An advanced model, high effort | Hardest reasoning; owns the publish step |
 | Copy writing, short one-shots | A fast model | Quick turnaround: a batch of captions in seconds |
-| Long mechanical work (image batches, extraction) | The cheapest capable model | Procedural work against a spec, not designing |
+| Long mechanical work (image batches, extraction) | The cheapest capable model, e.g. the lighter tier your subscription includes | Procedural work against a spec, not designing |
 | Validation | An advanced model of a **different family** from the executor | Independence matters more than cost; a weak validator misses real problems |
 | Image generation | An open local model, or a hosted image tool | The child's photos are the sensitive input; see the [images guide](4-images-with-qwen.md) |
 
 Older or cheaper models read instructions well but judged sources poorly in this project. Pair them with an advanced reviewer for any decision-changing work.
 
-**Examples as of 2026-09:** advanced models include Claude Opus 5.5 and GPT 6 Astra. Cheap/fast models include DeepSeek V4.1 Flash, GLM 5.3 Flash, and MiMo V2.6 Flash. Weigh cost against capability and use the subscriptions you already have.
+**Examples as of 2026-09:** advanced models include Claude Opus 5.5 and GPT 6 Astra. Cheap/fast models include DeepSeek V4.1 Flash, GLM 5.3 Flash, and MiMo V2.6 Flash. Use the subscriptions you already have.
 
-## What the original project used
-
-This is a record of the specific models and costs from the original build. It is not a recommendation.
-
-| Work | Model used |
-|---|---|
-| Orchestration (design, handoffs, monitoring) | Claude Opus 5.5, medium effort |
-| Complex animation code, final verification | Claude Opus 5.5, high effort |
-| Copy writing, short one-shots | GPT 6 Sol |
-| Image generation | Qwen-Image-2.1, locally on an M1 Max |
-
-
-
-|---|---|
-
-Per section (plan + generate + build):
-
-|---|---|---|---|
-
-Image generation dominated the clock. Each full-quality image took 15-20 minutes on an M1 Max, so a batch of four images ran for over an hour unattended.
+**Plan for usage limits.** Subscriptions have usage limits, and a validator that re-runs every check uses more than you might expect. Before a long unattended batch, check how much usage you have left and pick a second validator from another model family in case the first one runs out.
 
 ## How long it took
 
-The original project ran from a Tuesday to a Friday (about four calendar days). Most of that time the agents worked unattended: the parent checked in to approve artwork and review results.
+The original project ran from a Tuesday to a Friday (about four calendar days). Most of that time the agents worked unattended: the parent checked in to approve artwork and review results. Image generation dominated the clock: each full-quality image took 15-20 minutes on an M1 Max, so a batch of four images ran for over an hour unattended.
 
 ## Pitfalls you will hit
 
@@ -75,7 +56,7 @@ These are the real problems that came up during the build, in parent language.
 
 **An agent got stuck in a loop.** One agent kept polling a background job 223 times, wasting a lot of usage. Lesson: tell agents to stop polling after two skipped attempts and use a different strategy.
 
-**A signed-out agent looked like a finished agent.** When an agent's login expired, it sat idle, which the automation interpreted as "finished." Lesson: check that every agent is signed in before starting a batch, and make sure a sign-in failure stops the chain instead of passing the stage.
+**A signed-out agent looked like a finished agent.** When an agent's login expired, it sat idle, which the automation interpreted as "finished." Lesson: check that every agent is signed in and has usage left before starting a batch, and make sure a sign-in failure stops the chain instead of passing the stage.
 
 **WhatsApp cached the old preview image.** After changing the OG image, WhatsApp kept showing the old one because it caches by URL. Fix: bump the URL with a version parameter (`og.jpg?v=2`).
 
