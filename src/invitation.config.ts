@@ -75,12 +75,14 @@ export interface InvitationConfig {
 
 // ── Demo values (Gael, age 4) ────────────────────────────────────────────────
 
+const child: InvitationConfig['child'] = {
+  name: 'Gael',
+  age: 4,
+  pronouns: { subject: 'he', object: 'him', possessive: 'his' },
+};
+
 export const invitation: InvitationConfig = {
-  child: {
-    name: 'Gael',
-    age: 4,
-    pronouns: { subject: 'he', object: 'him', possessive: 'his' },
-  },
+  child,
   party: {
     date: 'Saturday, June 13, 2026',
     time: '3:00 p.m. to 6:00 p.m.',
@@ -91,12 +93,12 @@ export const invitation: InvitationConfig = {
   },
   rsvp: {
     whatsappNumber: '15555550123',
-    whatsappMessage: "Hi! We'll be at Gael's party. See you there!",
+    whatsappMessage: `Hi! We'll be at ${child.name}'s party. See you there!`,
   },
   site: {
     url: 'https://ai-kids-invitation.vercel.app',
-    title: 'Gael is turning 4! \ud83c\udf89',
-    description: "You're invited to Gael's birthday party. Come celebrate with us!",
+    title: `${child.name} is turning ${child.age}! \ud83c\udf89`,
+    description: `You're invited to ${child.name}'s birthday party. Come celebrate with us!`,
   },
   theme: {
     colors: {
