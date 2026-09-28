@@ -135,6 +135,8 @@ Before making the repository public or sharing the link:
 
 - [ ] **No real photos.** The `src/assets/source/` directory should contain only cartoon illustrations, never photographs of your child. Reference photos used for image generation should stay outside the repository entirely.
 - [ ] **No private paths.** Search the repository for your home directory path (`grep -ri '/Users/' .`) to make sure no private file paths appear in any committed file.
+- [ ] **No secrets.** No API keys, tokens, passwords or `.env` files.
+- [ ] **No home address unless it is the venue.** If the party is somewhere else, your home address must not appear anywhere in the repository or the page.
 - [ ] **No other people's data.** Do not include other children's names, parents' contact details, or any information belonging to someone else.
 
 **Verify before sharing:**

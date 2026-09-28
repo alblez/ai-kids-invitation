@@ -20,7 +20,7 @@ What it caught: the Details city plate came out at 1184 pixels wide instead of 1
 
 **Alpha channel cleanup.** After generation, faint alpha values (1-8 out of 255) are zeroed to eliminate residual fringe. The check counts how many pixels had residual alpha and confirms they were cleaned.
 
-What it caught: the smoke tests showed substantial residual alpha in the 1-8 range before cleanup (for example, the RSVP smoke had 938,932 out of 1,245,184 pixels with alpha 1-8). Full-quality masters were cleaned during the fitting step, and the ledger confirmed 0 residual alpha 1-8 on every fitted master. WebP derivatives were cleaned again after resizing, clearing 2,000-3,000 pixels per image. Without cleanup, these residuals show as a faint coloured halo when composited on the dark page background.
+What it caught: the smoke tests showed substantial residual alpha in the 1-8 range before cleanup (for example, the RSVP smoke had 938,932 out of 1,245,184 pixels with alpha of 8 or less, a count that also includes fully transparent pixels). Full-quality masters were cleaned during the fitting step, and the ledger confirmed 0 residual alpha 1-8 on every fitted master. WebP derivatives were cleaned again after resizing, clearing a few thousand pixels per image (2,993 and 3,285 on the two RSVP poses). Without cleanup, these residuals show as a faint coloured halo when composited on the dark page background.
 
 **Canvas clearance.** At least 20 pixels of transparent margin on all sides, so the image has room for animation (swing arcs, lean effects) without clipping.
 
@@ -46,7 +46,7 @@ What it measures:
 - **Face height** — used to scale multiple poses to the same head size (fit by face, not by total character height, because different poses have different body extents).
 - **Confidence** — a low confidence means Vision is unsure it found a face, which could indicate the face is obscured or the illustration style is too far from photorealistic.
 
-What it caught: earlier fitting scripts matched poses by their bounding box (hair/hood top to feet). This caused a 43-pixel face drift in one Activities pose because the hood added height that the base pose lacked. The Activities deviations were measured and accepted by the parent. The later RSVP and Details workflows used face-landmark fitting (eye-to-feet distance) to prevent this drift, and achieved sub-pixel registration (RSVP R01/R02 deltas were under 1 px on every axis).
+What it caught: earlier fitting scripts matched poses by their bounding box (hair/hood top to feet). This caused a 43-pixel face drift in one Activities pose because the hood added height that the base pose lacked. The Activities deviations were measured and accepted by the parent. The later RSVP and Details workflows used face-landmark fitting (eye-to-feet distance) to prevent this drift, and kept the two RSVP poses aligned: the generating agent reported deltas under 1 px, and the independent recheck measured about 1 px (face +0.3/−1.1 px, eyes −0.6/+0.8 px).
 
 #### Try it
 
@@ -142,7 +142,7 @@ ACT-R01 (Scientist pose)
   Native: 1024x1216 RGBA, 831,091 bytes
   Fitted: 1000x1200 RGBA, scale 0.95 (no upscale)
   Alpha 1-8 residual: 0 (after cleanup)
-  Clearance: min 43 px (top)
+  Clearance: min 50 px (bottom)
   Hand: 5 fingers, natural joints, confirmed at 4x
   Face blown: 1.02% any-channel (pass, < 2%)
   Hand blown: 0.00%

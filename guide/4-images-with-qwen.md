@@ -152,7 +152,7 @@ Generate contact sheets (side-by-side composites on the page background colour) 
 |---|---|---|---|
 | MPS `F.pad` corruption | Reference-edited images come out grey and flat | The wrapper patches the padding function at runtime | [Qwen-Image-2.1 #6](https://github.com/QwenLM/Qwen-Image-2.1/issues/6) |
 | NaN on second edit | A second image in the same process returns noise | Run one process per image (the wrapper does this) | [diffusers #14859](https://github.com/huggingface/diffusers/issues/14859) |
-| Grey/embossed edits | Edits at high reference resolution come out grey and embossed (same root cause as the `F.pad` bug) | Use `--res 768` instead of the default 1024 | [diffusers #14858](https://github.com/huggingface/diffusers/issues/14858) |
+| Grey/embossed edits | Editing an image the model itself generated, at `--res 1024`, comes out grey and embossed regardless of seed (photos as references were fine). The project's research suspected the same cause as the `F.pad` bug, but that was not confirmed | Use `--res 768` instead of the default 1024 | [diffusers #14858](https://github.com/huggingface/diffusers/issues/14858) |
 | Noise replay | Editing an image with the same seed and size that generated it returns a haloed near-copy | Use a different seed for each image | [diffusers #14824](https://github.com/huggingface/diffusers/issues/14824) |
 
 These are known issues in the Diffusers and PyTorch MPS backends. They may be fixed in future releases; check the linked issues before applying workarounds.

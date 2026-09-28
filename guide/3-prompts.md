@@ -127,7 +127,7 @@ text, labels, or extra characters. The image has alpha channel
 and the background is transparent.
 ```
 
-In the original prompts, `<image1>` was the costume front view (canvas/pose), `<image2>` was the face close-up crop from the reference sheet (identity anchor), and `<image3>` was the full reference sheet (style anchor). State each image's role explicitly in your prompt.
+The image roles differed per section. For the Activities poses, `<image1>` was an uncostumed full-body crop from the reference sheet; for the RSVP poses, `<image1>` was the costume front view. In both, `<image2>` was the face close-up crop (identity anchor) and `<image3>` the full reference sheet (style anchor). Whatever you use, state each image's role explicitly in your prompt.
 
 ### Costume variant (reference editing)
 
