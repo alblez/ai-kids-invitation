@@ -46,7 +46,7 @@ Image generation dominated the clock. Each full-quality image took 15-20 minutes
 
 ## How long it took
 
-The original project ran from a Monday afternoon to a Thursday evening. Most of that time the agents worked unattended: the parent checked in to approve artwork and review results. Active parent time was a fraction of the total, but you should budget about four days of calendar time for a similar project, with real work spread across mornings and evenings.
+The original project ran from a Tuesday to a Friday (about four calendar days). Most of that time the agents worked unattended: the parent checked in to approve artwork and review results.
 
 ## Pitfalls you will hit
 
@@ -70,4 +70,4 @@ These are the real problems that came up during the build, in parent language.
 
 ## The chain that kept work moving
 
-The orchestrator launched each stage as a fresh agent session. Between the orchestrator's own context resets (which happened four times as the conversation grew too long), a small script kept the work queue running. The script was simple and had known bugs (it could not reliably tell if an agent had crashed versus finished), but it worked because the orchestrator checked every result itself. In the published process repository (coming soon), this is replaced by a more robust runner that requires each stage to write a structured result file before advancing.
+The orchestrator launched each stage as a fresh agent session. Between the orchestrator's own context resets (which happened four times as the conversation grew too long), a small script kept the work queue running. The script was simple and had known bugs (it could not reliably tell if an agent had crashed versus finished), but it worked because the orchestrator checked every result itself.

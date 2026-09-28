@@ -17,21 +17,28 @@ Everything runs as a static site: no backend, no data collection, no accounts.
 
 ## Make it yours in an afternoon
 
+Fork this repo on GitHub, then clone your fork:
+
 ```sh
 git clone https://github.com/<your-username>/ai-kids-invitation.git
 cd ai-kids-invitation
 npm install
 ```
 
+Prerequisites: Node >= 22.12 (see `package.json`). The OG image generator (`scripts/generate-og.mjs`) uses macOS `sips`, so it only runs on a Mac.
+
 Edit the files that hold your party's details:
 
 | What to change | File |
 |---|---|
-| Child's name, age, page text | `src/components/Hero.astro`, `Details.astro`, `Activities.astro`, `Rsvp.astro` |
+| Child's name, age, page text | `src/components/Hero.astro`, `Activities.astro`, `Rsvp.astro` |
 | Date, time, venue, map links | `src/components/Details.astro` (`partyDetails` object) |
 | WhatsApp number and message | `src/components/Rsvp.astro` (`whatsappNumber`, `whatsappMessage`) |
 | Site URL and OG metadata | `astro.config.mjs` (`site`), `src/layouts/Layout.astro` (`title`, `description`) |
+| OG image text (name, age, date, time, venue) | `scripts/generate-og.mjs` |
 | Character images | `src/assets/hero/`, `details/`, `activities/`, `rsvp/` |
+
+To find every place the child's name appears, search for it: `grep -rn Gael src scripts`. Do not search for the age number (too many CSS and animation values match).
 
 Regenerate the WhatsApp preview image and deploy:
 
@@ -45,7 +52,7 @@ See the [guide](guide/) for the full process: how the images were made locally w
 
 ## The process behind this
 
-The agentic process repository that describes how AI agents were coordinated to build this invitation will be published soon. It covers ideation, roadmaps, chained agent runs, image generation, validation, and the lessons learned.
+The agentic process repository behind this project, **agentic-roadmaps**, will be published soon.
 
 ## Development
 

@@ -83,8 +83,8 @@ Likeness to keep:
 - <eye colour and expression>
 - <smile description>
 
-Give him the show's proportions (about 3 heads tall, very large round
-head, big expressive eyes, small soft body) while keeping these
+Give him preschool 3D CG proportions (about 3 heads tall, very large
+round head, big expressive eyes, small soft body) while keeping these
 features recognizable as this child.
 
 Layout: two figures of the same child side by side. Left: head-and-
@@ -126,6 +126,8 @@ Keep his standing pose, feet visible and flat on the ground. No
 text, labels, or extra characters. The image has alpha channel
 and the background is transparent.
 ```
+
+In the original prompts, `<image1>` was the costume front view (canvas/pose), `<image2>` was the face close-up crop from the reference sheet (identity anchor), and `<image3>` was the full reference sheet (style anchor). State each image's role explicitly in your prompt.
 
 ### Costume variant (reference editing)
 
@@ -180,6 +182,8 @@ Status: all checks pass -> technically-validated.
 Any check fails -> needs-revision with the specific failure listed.
 Parent approval is a separate human decision.
 ```
+
+In practice, the face-centre and eye-line thresholds above (6 px) were used for the RSVP pose pair. The Activities section used a 10 px threshold. Adjust the thresholds to what your animation needs: a costume-change wipe tolerates less drift than a discrete pose swap.
 
 ## 5. Stage handoff skeleton
 

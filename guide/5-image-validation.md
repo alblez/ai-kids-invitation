@@ -20,7 +20,7 @@ What it caught: the Details city plate came out at 1184 pixels wide instead of 1
 
 **Alpha channel cleanup.** After generation, faint alpha values (1-8 out of 255) are zeroed to eliminate residual fringe. The check counts how many pixels had residual alpha and confirms they were cleaned.
 
-What it caught: every generated image had some residual alpha in the 1-8 range. Without cleanup, these show as a faint coloured halo when composited on the dark page background.
+What it caught: the smoke tests showed substantial residual alpha in the 1-8 range before cleanup (for example, the RSVP smoke had 938,932 out of 1,245,184 pixels with alpha 1-8). Full-quality masters were cleaned during the fitting step, and the ledger confirmed 0 residual alpha 1-8 on every fitted master. WebP derivatives were cleaned again after resizing, clearing 2,000-3,000 pixels per image. Without cleanup, these residuals show as a faint coloured halo when composited on the dark page background.
 
 **Canvas clearance.** At least 20 pixels of transparent margin on all sides, so the image has room for animation (swing arcs, lean effects) without clipping.
 
@@ -37,7 +37,7 @@ What it caught:
 
 ### Face landmark checks
 
-On macOS, Apple Vision framework detects illustrated faces and returns landmark coordinates (eye positions, face centre, face height, confidence score). A small Swift script calls Vision and prints the measurements.
+On macOS, Apple Vision framework detects illustrated faces and returns landmark coordinates (eye positions, face centre, face height, confidence score). This repository includes a small Swift script (`tools/face-landmarks.swift`) that calls Vision and prints the measurements.
 
 What it measures:
 
@@ -46,7 +46,21 @@ What it measures:
 - **Face height** — used to scale multiple poses to the same head size (fit by face, not by total character height, because different poses have different body extents).
 - **Confidence** — a low confidence means Vision is unsure it found a face, which could indicate the face is obscured or the illustration style is too far from photorealistic.
 
-What it caught: earlier fitting scripts matched poses by their bounding box (hair/hood top to feet). This caused a 43-pixel face drift in one Activities pose because the hood added height that the base pose lacked. Switching to face-landmark fitting (eye-to-feet distance) eliminated the systematic drift.
+What it caught: earlier fitting scripts matched poses by their bounding box (hair/hood top to feet). This caused a 43-pixel face drift in one Activities pose because the hood added height that the base pose lacked. The Activities deviations were measured and accepted by the parent. The later RSVP and Details workflows used face-landmark fitting (eye-to-feet distance) to prevent this drift, and achieved sub-pixel registration (RSVP R01/R02 deltas were under 1 px on every axis).
+
+#### Try it
+
+```sh
+swift tools/face-landmarks.swift src/assets/source/ACT-R01-master-1000x1200.png
+```
+
+This prints six space-separated numbers:
+
+```
+488.093 275.199 489.786 323.799 265.068 1.000
+```
+
+In order: eye midpoint x, eye midpoint y, face centre x, face centre y, face height, confidence. All coordinates are in top-left pixel space of the input image.
 
 ### Finger and hand counts
 
@@ -64,7 +78,7 @@ What it caught: the Details pose had a blue upper sleeve on the pointing arm whe
 
 Regions of the face and hands were checked for pixels with values above 250 in any channel. The threshold was 2% of the region. Blown highlights indicate the model rendered the skin or gloves too bright, losing detail.
 
-What it caught: the Details pose had 6.2% of face pixels above 250 in the red channel (warm CG lighting on rosy cheeks). It was flagged as a documented deviation. All-channel blown pixels were 0%, so the issue was cosmetic highlights, not lost detail.
+What it caught: the Details pose had elevated face highlights in the red channel. The generating report measured 6.2% R-channel pixels above 250 in the face region (box 100:400, 300:700); the subsequent independent recheck measured 9.1% R-channel in the Vision-detected face box (a different, tighter region). Both measurements found 0% all-channel blown pixels, so the issue was cosmetic warm CG lighting on rosy cheeks, not lost detail. It was flagged as a documented deviation.
 
 ### Hair fringe inspection
 
@@ -77,10 +91,30 @@ What it caught: early smoke tests showed a possible purple halo. Full-quality ma
 For every set of related poses, the validation agent generated:
 
 - **Individual composites** on the page background colour, to see how each image looks in context.
-- **A contact sheet** (2x2 grid for four poses, side-by-side for two) for quick comparison.
+- **A contact sheet** (side-by-side grid) for quick comparison.
 - **50% overlay images** blending each variant against the base pose, to check face/body registration.
 
 These are visual evidence files that the parent can glance at to spot problems without opening each image individually.
+
+#### Try it
+
+ImageMagick (`magick`) must be installed. These commands work on the source PNGs in this repository:
+
+Contact sheet (four poses side by side on the page background):
+
+```sh
+magick src/assets/source/ACT-R0{1,2,3,4}-master-1000x1200.png \
+  -resize 400x480 -background '#0f172a' -gravity center -extent 416x496 \
+  +append contact.png
+```
+
+50% overlay (blend two poses to check registration):
+
+```sh
+magick src/assets/source/ACT-R01-master-1000x1200.png \
+  src/assets/source/ACT-R02-master-1000x1200.png \
+  -compose blend -define compose:args=50 -composite overlay.png
+```
 
 ## The approval workflow
 
@@ -97,22 +131,24 @@ not requested -> requested -> received -> technically-validated -> parent-approv
 
 **Publication is not approval.** In this project, the parent authorized deploying candidate images to the live site before approving the artwork, so the assembled result could be reviewed in context on real phones. A deployed image with a `needs-revision` flag was still pending approval.
 
-## Example: a generic validation report
+Note that validation thresholds differed per section. For example, the Activities poses used a face registration target of 10 px (which ACT-R02 and ACT-R04 exceeded, prompting revision requests that the parent ultimately waived), while the RSVP poses used a stricter 6 px target and met it.
 
-A typical validation entry for one image looks like this:
+## Example: an illustrative validation entry
+
+A typical validation entry for one image looks like this. The numbers below are taken from the ACT-R01 (scientist pose) record to show the format; your images will have different values.
 
 ```
 ACT-R01 (Scientist pose)
-  Native: 1024x1216 RGBA, 886,995 bytes
-  Fitted: 1000x1200 RGBA, scale 0.86 (no upscale)
+  Native: 1024x1216 RGBA, 831,091 bytes
+  Fitted: 1000x1200 RGBA, scale 0.95 (no upscale)
   Alpha 1-8 residual: 0 (after cleanup)
   Clearance: min 43 px (top)
   Hand: 5 fingers, natural joints, confirmed at 4x
-  Face blown: 0.00%
+  Face blown: 1.02% any-channel (pass, < 2%)
   Hand blown: 0.00%
-  Sleeves: both red, matching reference
+  Sleeves: grey T-shirt, matching reference (scientist wears no suit)
   Hair fringe on dark: neutral, no halo
-  Registration vs reference: face centre +0.2 px, eyes -0.4 px
+  Registration vs reference: (baseline pose, no cross-pose delta)
   Status: technically-validated
 ```
 

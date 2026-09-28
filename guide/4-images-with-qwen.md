@@ -7,11 +7,11 @@ The child's reference photos never leave your computer. This matters for two rea
 1. **Privacy.** You do not upload photos of your child to a cloud service. The local model runs entirely on your machine.
 2. **Capability.** In this project, hosted image tools (such as ChatGPT's image generation) refused or blocked requests involving photos of a child in a superhero costume. The local model had no such restrictions and produced friendly cartoon likenesses.
 
-The model used is **Qwen-Image-2.1**, an open image generation and editing model that supports reference editing: you give it a photo of your child, and it generates a cartoon version that preserves the likeness. It runs on Apple Silicon Macs using the Diffusers library with MPS (Metal Performance Shaders) acceleration.
+The model used is **[Qwen-Image-2.1](https://huggingface.co/Qwen/Qwen-Image-2.1)**, an open image generation and editing model that supports reference editing: you give it a photo of your child, and it generates a cartoon version that preserves the likeness. It runs on Apple Silicon Macs using the Diffusers library with MPS (Metal Performance Shaders) acceleration.
 
 ## Installation
 
-The project used a wrapper script (`qwen-image-2.1`) that handles the setup and works around known Apple Silicon bugs. The wrapper runs Qwen-Image-2.1 through the Diffusers library in a dedicated Python virtual environment.
+This repository includes a wrapper script at `tools/qwen-image-2.1` that handles the setup and works around known Apple Silicon bugs. The wrapper runs Qwen-Image-2.1 through the Diffusers library in a dedicated Python virtual environment.
 
 ### What the wrapper does
 
@@ -23,15 +23,15 @@ The project used a wrapper script (`qwen-image-2.1`) that handles the setup and 
 
 ### Prerequisites
 
-- An Apple Silicon Mac with at least 32 GB of unified memory (64 GB recommended).
+- An Apple Silicon Mac. This project used a 64 GB M1 Max.
 - Python 3.12.
 - About 32 GB of disk space for the model weights (downloaded once from Hugging Face).
 
 ### Steps
 
-Follow the model's official instructions for installing Qwen-Image-2.1 with Diffusers. The key packages are:
+Follow the [official model instructions](https://huggingface.co/Qwen/Qwen-Image-2.1) for installing Qwen-Image-2.1 with Diffusers. The key packages are:
 
-- `torch` (2.14 or later)
+- `torch` (the model instructions require `>=2.4`; this project used 2.14.0)
 - `transformers` (5.17 or later)
 - `diffusers` (installed from the GitHub main branch, not a release)
 - `accelerate`
@@ -46,28 +46,35 @@ uv pip install --python ~/.local/share/qwen21-diffusers/bin/python \
   "diffusers @ https://github.com/huggingface/diffusers/archive/main.tar.gz"
 ```
 
+The wrapper reads the Python at `$HOME/.local/share/qwen21-diffusers/bin/python` by default. You can override this with the `PY` environment variable: `PY=/path/to/python ./tools/qwen-image-2.1 …`.
+
 The first run downloads the model weights (~31 GB) to the Hugging Face cache. Subsequent runs reuse the cache.
 
 ## Using the wrapper
 
+Run the wrapper from the repository root, or copy it onto your `PATH`:
+
 ```sh
 # Text-to-image
-qwen-image-2.1 --prompt "A cat astronaut" --output cat.png
+./tools/qwen-image-2.1 --prompt "A cat astronaut" --output cat.png
 
 # Reference editing (identity from reference photo)
-qwen-image-2.1 --prompt "Put <image1> in a superhero costume" \
+./tools/qwen-image-2.1 --prompt "Put <image1> in a superhero costume" \
   --output hero.png --ref photo.png
+```
 
-# Full options
-qwen-image-2.1 \
+Full options:
+
+```sh
+./tools/qwen-image-2.1 \
   --prompt "..." \
   --output out.png \
-  --width 1024 --height 1216 \    # output size, multiples of 32
-  --steps 40 \                     # denoising steps (default 40)
-  --seed 42 \                      # reproducible seed
-  --ref reference1.png \           # reference image(s)
+  --width 1024 --height 1216 \
+  --steps 40 \
+  --seed 42 \
+  --ref reference1.png \
   --ref reference2.png \
-  --res 768                        # reference encoding resolution
+  --res 768
 ```
 
 ### Options explained
@@ -76,19 +83,19 @@ qwen-image-2.1 \
 |---|---|---|
 | `--prompt` | (required) | For text-to-image: describe the image. For edits: an instruction like "Change the clothing to..." |
 | `--output` | (required) | Output PNG path |
-| `--width`, `--height` | 1024 | Must be multiples of 32 |
-| `--steps` | 40 | More steps = better quality but slower. 8 steps is enough for a smoke test. |
-| `--seed` | random | Use a fixed seed for reproducibility. Each image should have its own seed. |
-| `--ref` | none | Reference image(s). Use `<image1>`, `<image2>` etc. in the prompt to refer to them. With one reference, say "the image" instead. |
-| `--res` | 768 | Resolution for encoding reference images. 768 is a safe value that avoids MPS corruption. |
+| `--width`, `--height` | 1024 | Output size, must be multiples of 32 |
+| `--steps` | 40 | More steps = better quality but slower |
+| `--seed` | random | Use a fixed seed for reproducibility. Each image should have its own seed |
+| `--ref` | none | Reference image(s). Use `<image1>`, `<image2>` etc. in the prompt to refer to them. With one reference, say "the image" instead |
+| `--res` | 768 | Resolution for encoding reference images. 768 is a safe value that avoids MPS corruption |
 
 ### Timing
 
 On an M1 Max with 64 GB:
 
-- **1024x1216 with references, 40 steps:** ~18 minutes (~26 s/step, first step ~107 s for reference encoding)
-- **1024x1024 text-to-image, 40 steps:** ~11 minutes (~16 s/step)
-- **Smoke test at 8 steps:** ~3 minutes
+- **1024x1536 with references, 40 steps:** ~21 minutes, ~30 s/step (from the wrapper help).
+- **1024x1216 with references, 40 steps:** ~18 minutes. The four Activities poses averaged 23–25 s/step; the two RSVP poses took 1087 s and 1045 s.
+- **1024x1536 with references, 12 steps (smoke test):** 443 s total, first step 107 s (includes reference encoding prefill), then ~30 s/step.
 
 The agent can run image generation unattended. Each image is a separate process, so you can queue a batch and walk away.
 
@@ -129,7 +136,7 @@ Each pose is generated by editing the costume front view or a base pose. The pro
 
 Raw outputs are larger than what the web page needs. A fitting script:
 
-1. Detects the face using Apple Vision landmarks (on macOS) for accurate positioning.
+1. Detects the face using Apple Vision landmarks (on macOS) for accurate positioning. This was used in the RSVP and Details workflows; the Activities poses were fitted by head size and feet baseline, and their face registration deviations (up to 43 px) were measured and accepted by the parent.
 2. Scales the image to the target canvas size without upscaling.
 3. Aligns multiple poses to the same face position and foot baseline.
 4. Zeros out faint alpha residuals (values 1-8) that cause halo artifacts on dark backgrounds.
@@ -141,10 +148,11 @@ Generate contact sheets (side-by-side composites on the page background colour) 
 
 ## Known Apple Silicon issues
 
-| Bug | Symptom | Workaround |
-|---|---|---|
-| MPS `F.pad` corruption | Reference-edited images come out grey and flat | The wrapper patches the padding function at runtime |
-| NaN on second edit | A second image in the same process returns noise | Run one process per image (the wrapper does this) |
-| Noise replay | Editing an image with the same seed and size that generated it returns a near-copy | Use a different seed for each image |
+| Bug | Symptom | Workaround | Upstream |
+|---|---|---|---|
+| MPS `F.pad` corruption | Reference-edited images come out grey and flat | The wrapper patches the padding function at runtime | [Qwen-Image-2.1 #6](https://github.com/QwenLM/Qwen-Image-2.1/issues/6) |
+| NaN on second edit | A second image in the same process returns noise | Run one process per image (the wrapper does this) | [diffusers #14859](https://github.com/huggingface/diffusers/issues/14859) |
+| Grey/embossed edits | Edits at high reference resolution come out grey and embossed (same root cause as the `F.pad` bug) | Use `--res 768` instead of the default 1024 | [diffusers #14858](https://github.com/huggingface/diffusers/issues/14858) |
+| Noise replay | Editing an image with the same seed and size that generated it returns a haloed near-copy | Use a different seed for each image | [diffusers #14824](https://github.com/huggingface/diffusers/issues/14824) |
 
 These are known issues in the Diffusers and PyTorch MPS backends. They may be fixed in future releases; check the linked issues before applying workarounds.
